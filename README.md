@@ -78,7 +78,7 @@ backgroundremover -i "/path/to/image.jpeg" -m "u2net_human_seg" -o "output.png"
 ```bash
 backgroundremover -i "/path/to/video.mp4" -tv -o "output.mov"
 ```
-###remove background from local video and overlay it over other video
+### remove background from local video and overlay it over other video
 ```bash
 backgroundremover -i "/path/to/video.mp4" -tov -tv "/path/to/videtobeoverlayed.mp4" -o "output.mov"
 ```
