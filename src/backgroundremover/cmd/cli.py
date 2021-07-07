@@ -2,7 +2,6 @@ import argparse
 import glob
 import os
 from distutils.util import strtobool
-import multiprocessing
 
 from ..bg import remove
 from ..utilities import matte_key, transparentgif, transparentvideo, transparentvideoovervideo, transparentvideooverimage, \
@@ -261,5 +260,5 @@ def main():
 
 
 if __name__ == "__main__":
-    multiprocessing.set_start_method('spawn')
+    torch.multiprocessing.set_start_method('spawn')
     main()
