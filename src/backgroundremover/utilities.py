@@ -10,7 +10,7 @@ import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
 try:
-     set_start_method('spawn')
+     multiprocessing.set_start_method('spawn')
 except RuntimeError:
     pass
 
