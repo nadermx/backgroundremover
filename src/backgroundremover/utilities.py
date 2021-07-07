@@ -1,6 +1,6 @@
 import os
 import math
-import multiprocessing
+import torch.multiprocessing as multiprocessing
 import subprocess as sp
 import time
 import ffmpeg
@@ -9,6 +9,10 @@ import torch
 import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
+try:
+     set_start_method('spawn')
+except RuntimeError:
+    pass
 
 def worker(worker_nodes,
            worker_index,
