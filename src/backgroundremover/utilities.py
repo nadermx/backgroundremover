@@ -9,11 +9,6 @@ import torch
 import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
-from torch.multiprocessing import Pool, Process, set_start_method
-try:
-     set_start_method('spawn')
-except RuntimeError:
-    pass
 
 def worker(worker_nodes,
            worker_index,
