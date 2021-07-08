@@ -9,10 +9,8 @@ import torch
 import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
-try:
-     multiprocessing.set_start_method('spawn')
-except RuntimeError:
-    pass
+multiprocessing.set_start_method('spawn', force=True)
+
 
 def worker(worker_nodes,
            worker_index,
@@ -119,8 +117,7 @@ def matte_key(output, file_path,
 
             for frame in frames:
                 if command is None:
-                    command = ['nice', '-10',
-                               'ffmpeg',
+                    command = ['ffmpeg',
                                '-y',
                                '-f', 'rawvideo',
                                '-vcodec', 'rawvideo',
@@ -145,7 +142,6 @@ def matte_key(output, file_path,
                     proc.stdin.close()
                     proc.wait()
                     print(F"FINISHED ALL FRAMES ({total_frames})!")
-
                     return
 
     p.join()
