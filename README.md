@@ -14,7 +14,7 @@ by [BackgroundRemover.app](https://backgroundremover.app) which is an app made b
 * python3.6-dev
 * torch and torchvision stable version (https://pytorch.org)
 
-* ffmpeg 4.2+
+* ffmpeg 4.4+
 
 #### How to install torch and fmpeg
 
