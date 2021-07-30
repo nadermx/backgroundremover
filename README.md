@@ -9,8 +9,8 @@ by [BackgroundRemover.app](https://backgroundremover.app) which is an app made b
 
 ### Requirements
 
-* python 3.6 (only one tested so far but may work for < 3.6)
-* python3.6-dev
+* python <= 3.6
+* python3.6-dev #or what ever version of python you using
 * torch and torchvision stable version (https://pytorch.org)
 
 * ffmpeg 4.4+
