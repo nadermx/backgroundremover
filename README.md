@@ -1,18 +1,17 @@
 # BackgroundRemover
 
-A command line tool to remove background from [video](https://backgroundremover.app/video)
+BackgroundRemover is a command line tool to remove background from [video](https://backgroundremover.app/video)
 and [image](https://backgroundremover.app/image), brought to you
 by [BackgroundRemover.app](https://backgroundremover.app) which is an app made by [nadermx](https://john.nader.mx) powered by this tool
 
 <img alt="background remover image" src="https://backgroundremover.app/static/backgroundremoverexample.png" height="200" />
-<img alt="background remover video" src="https://backgroundremover.app/static/backgroundremover.gif" height="200" />
+<img alt="background remover video" src="https://backgroundremover.app/static/backgroundremoverprocessed.gif" height="200" />
 
 ### Requirements
 
 * python <= 3.6
 * python3.6-dev #or what ever version of python you using
 * torch and torchvision stable version (https://pytorch.org)
-
 * ffmpeg 4.4+
 
 #### How to install torch and fmpeg
@@ -29,17 +28,10 @@ Language: Python
 CUDA: None
 ```
 
-To install ffmpeg
+To install ffmpeg and python-dev
 
 ```
 sudo apt install ffmpeg python3.6-dev
-```
-
-To install torch:
-
-```
-pip install --upgrade pip
-pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ### Installation
@@ -47,6 +39,7 @@ pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.
 To Install backgroundremover, install it from pypi
 
 ```bash
+pip install --upgrade pip
 pip install backgroundremover
 ```
 
