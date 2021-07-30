@@ -5,7 +5,8 @@ and [image](https://backgroundremover.app/image), brought to you
 by [BackgroundRemover.app](https://backgroundremover.app) which is an app made by [nadermx](https://john.nader.mx) powered by this tool
 
 <img alt="background remover image" src="https://backgroundremover.app/static/backgroundremoverexample.png" height="200" />
-<img alt="background remover video" src="https://backgroundremover.app/static/backgroundremoverprocessed.gif" height="200" />
+<img alt="background remover video" src="/examplegif/backgroundremoverprocessed.gif" height="200" />
+
 
 ### Requirements
 
