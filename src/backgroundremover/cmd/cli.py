@@ -2,12 +2,9 @@ import argparse
 import glob
 import os
 from distutils.util import strtobool
-
-from ..bg import remove
-from ..utilities import matte_key, transparentgif, transparentvideo, transparentvideoovervideo, transparentvideooverimage, \
-    transparentgifwithbackground
-import torch
 from .. import utilities
+from ..bg import remove
+import torch
 
 
 def main():
@@ -15,9 +12,11 @@ def main():
         "U2NETP_PATH",
         os.path.expanduser(os.path.join("~", ".u2net")),
     )
+    print(model_path)
     model_choices = [os.path.splitext(os.path.basename(x))[0] for x in set(glob.glob(model_path + "/*"))]
+    print('here', model_choices)
     if len(model_choices) == 0:
-        model_choices = ["u2net", "u2netp", "u2net_human_seg"]
+        model_choices = ["u2net", "u2net_human_seg", "u2netp"]
 
     ap = argparse.ArgumentParser()
 
@@ -197,21 +196,21 @@ def main():
     args = ap.parse_args()
     if args.input.name.rsplit('.', 1)[1] in ['mp4', 'mov', 'webm', 'ogg', 'gif']:
         if args.mattekey:
-            matte_key(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
+            utilities.matte_key(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
                       worker_nodes=args.workernodes,
                       gpu_batchsize=args.gpubatchsize,
                       model_name=args.model,
                       frame_limit=args.framelimit,
                       framerate=args.framerate)
         elif args.transparentvideo:
-            transparentvideo(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
+            utilities.transparentvideo(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
                              worker_nodes=args.workernodes,
                              gpu_batchsize=args.gpubatchsize,
                              model_name=args.model,
                              frame_limit=args.framelimit,
                              framerate=args.framerate)
         elif args.transparentvideoovervideo:
-            transparentvideoovervideo(os.path.abspath(args.output.name), os.path.abspath(args.backgroundvideo.name),
+            utilities.transparentvideoovervideo(os.path.abspath(args.output.name), os.path.abspath(args.backgroundvideo.name),
                                  os.path.abspath(args.input.name),
                                  worker_nodes=args.workernodes,
                                  gpu_batchsize=args.gpubatchsize,
@@ -219,7 +218,7 @@ def main():
                                  frame_limit=args.framelimit,
                                  framerate=args.framerate)
         elif args.transparentvideooverimage:
-            transparentvideooverimage(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name),
+            utilities.transparentvideooverimage(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name),
                                  os.path.abspath(args.input.name),
                                  worker_nodes=args.workernodes,
                                  gpu_batchsize=args.gpubatchsize,
@@ -227,14 +226,14 @@ def main():
                                  frame_limit=args.framelimit,
                                  framerate=args.framerate)
         elif args.transparentgif:
-            transparentgif(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
+            utilities.transparentgif(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
                            worker_nodes=args.workernodes,
                            gpu_batchsize=args.gpubatchsize,
                            model_name=args.model,
                            frame_limit=args.framelimit,
                            framerate=args.framerate)
         elif args.transparentgifwithbackground:
-            transparentgifwithbackground(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name), os.path.abspath(args.input.name),
+            utilities.transparentgifwithbackground(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name), os.path.abspath(args.input.name),
                               worker_nodes=args.workernodes,
                               gpu_batchsize=args.gpubatchsize,
                               model_name=args.model,
@@ -260,5 +259,5 @@ def main():
 
 
 if __name__ == "__main__":
-    torch.multiprocessing.set_start_method('spawn')
+    # torch.multiprocessing.set_start_method('spawn')
     main()

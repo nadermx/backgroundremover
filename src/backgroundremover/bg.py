@@ -16,61 +16,75 @@ import torch.nn.functional
 from hsh.library.hash import Hasher
 from tqdm import tqdm
 from .u2net import detect, u2net
+from ..backgroundremover import utilities
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 
 class Net(torch.nn.Module):
     def __init__(self, model_name):
         super(Net, self).__init__()
         hasher = Hasher()
 
-        model, hash_val, drive_target, env_var = {
+        model = {
             'u2netp': (u2net.U2NETP,
                        'e4f636406ca4e2af789941e7f139ee2e',
                        '1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy',
                        'U2NET_PATH'),
             'u2net': (u2net.U2NET,
                       '09fb4e49b7f785c9f855baf94916840a',
-                      '1-Yg0cxgrNhHP-016FPdp902BR-kSsA4P',
+                      '1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ',
                       'U2NET_PATH'),
             'u2net_human_seg': (u2net.U2NET,
                                 '347c3d51b01528e5c6c071e3cff1cb55',
-                                '1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ',
+                                '1-Yg0cxgrNhHP-016FPdp902BR-kSsA4P',
                                 'U2NET_PATH')
         }[model_name]
-        path = os.environ.get(env_var, os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")))
-        net = model(3, 1)
-        if not os.path.exists(path) or hasher.md5(path) != hash_val:
-            head, tail = os.path.split(path)
-            os.makedirs(head, exist_ok=True)
 
-            URL = "https://docs.google.com/uc?export=download"
+        if model_name == "u2netp":
+            net = u2net.U2NETP(3, 1)
+            path = os.environ.get(
+                "U2NETP_PATH",
+                os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
+            )
+            if (
+                not os.path.exists(path)
+                or hasher.md5(path) != "e4f636406ca4e2af789941e7f139ee2e"
+            ):
+                utilities.download_file_from_google_drive(
+                    model, path,
+                )
 
-            session = requests.Session()
-            response = session.get(URL, params={"id": drive_target}, stream=True)
+        elif model_name == "u2net":
+            net = u2net.U2NET(3, 1)
+            path = os.environ.get(
+                "U2NET_PATH",
+                os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
+            )
+            if (
+                not os.path.exists(path)
+                or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
+            ):
+                utilities.download_file_from_google_drive(
+                    model, path,
+                )
 
-            token = None
-            for key, value in response.cookies.items():
-                if key.startswith("download_warning"):
-                    token = value
-                    break
+        elif model_name == "u2net_human_seg":
+            net = u2net.U2NET(3, 1)
+            path = os.environ.get(
+                "U2NET_PATH",
+                os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
+            )
+            if (
+                not os.path.exists(path)
+                or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
+            ):
+                utilities.download_file_from_google_drive(
+                    model, path,
+                )
+        else:
+            print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
 
-            if token:
-                params = {"id": drive_target, "confirm": token}
-                response = session.get(URL, params=params, stream=True)
-
-            total = int(response.headers.get("content-length", 0))
-
-            with open(path, "wb") as file, tqdm(
-                    desc=f"Downloading {tail} to {head}",
-                    total=total,
-                    unit="iB",
-                    unit_scale=True,
-                    unit_divisor=1024,
-            ) as bar:
-                for data in response.iter_content(chunk_size=1024):
-                    size = file.write(data)
-                    bar.update(size)
         net.load_state_dict(torch.load(path, map_location=torch.device(DEVICE)))
         net.to(device=DEVICE, dtype=torch.float32, non_blocking=True)
         net.eval()
@@ -91,14 +105,13 @@ class Net(torch.nn.Module):
         return out
 
 
-
 def alpha_matting_cutout(
-        img,
-        mask,
-        foreground_threshold,
-        background_threshold,
-        erode_structure_size,
-        base_size,
+    img,
+    mask,
+    foreground_threshold,
+    background_threshold,
+    erode_structure_size,
+    base_size,
 ):
     size = img.size
 
@@ -160,13 +173,13 @@ def get_model(model_name):
 
 
 def remove(
-        data,
-        model_name="u2net",
-        alpha_matting=False,
-        alpha_matting_foreground_threshold=240,
-        alpha_matting_background_threshold=10,
-        alpha_matting_erode_structure_size=10,
-        alpha_matting_base_size=1000,
+    data,
+    model_name="u2net",
+    alpha_matting=False,
+    alpha_matting_foreground_threshold=240,
+    alpha_matting_background_threshold=10,
+    alpha_matting_erode_structure_size=10,
+    alpha_matting_base_size=1000,
 ):
     model = get_model(model_name)
     img = Image.open(io.BytesIO(data)).convert("RGB")

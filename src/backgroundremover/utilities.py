@@ -9,6 +9,9 @@ import torch
 import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
+import gdown
+from tqdm import tqdm
+
 multiprocessing.set_start_method('spawn', force=True)
 
 
@@ -283,3 +286,10 @@ def transparentvideooverimage(output, overlay, file_path,
         sp.run(shlex.split(cmd))
         print("Process finished")
     return
+
+def download_file_from_google_drive(model, path):
+    head, tail = os.path.split(path)
+    os.makedirs(head, exist_ok=True)
+    URL = "https://drive.google.com/uc?id=%s" % model[2]
+
+    gdown.download(URL, path, quiet=False)

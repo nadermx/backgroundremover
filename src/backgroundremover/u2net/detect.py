@@ -1,7 +1,7 @@
 import errno
 import os
 import sys
-
+import gdown
 import numpy as np
 import requests
 import torch
@@ -11,43 +11,25 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from . import data_loader, u2net
-
-
-def download_file_from_google_drive(id, fname, destination):
-    head, tail = os.path.split(destination)
-    os.makedirs(head, exist_ok=True)
-
-    URL = "https://docs.google.com/uc?export=download"
-
-    session = requests.Session()
-    response = session.get(URL, params={"id": id}, stream=True)
-
-    token = None
-    for key, value in response.cookies.items():
-        if key.startswith("download_warning"):
-            token = value
-            break
-
-    if token:
-        params = {"id": id, "confirm": token}
-        response = session.get(URL, params=params, stream=True)
-
-    total = int(response.headers.get("content-length", 0))
-
-    with open(destination, "wb") as file, tqdm(
-        desc=f"Downloading {tail} to {head}",
-        total=total,
-        unit="iB",
-        unit_scale=True,
-        unit_divisor=1024,
-    ) as bar:
-        for data in response.iter_content(chunk_size=1024):
-            size = file.write(data)
-            bar.update(size)
-
+from ...backgroundremover import utilities
 
 def load_model(model_name: str = "u2net"):
     hasher = Hasher()
+
+    model = {
+        'u2netp': (u2net.U2NETP,
+                   'e4f636406ca4e2af789941e7f139ee2e',
+                   '1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy',
+                   'U2NET_PATH'),
+        'u2net': (u2net.U2NET,
+                  '09fb4e49b7f785c9f855baf94916840a',
+                  '1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ',
+                  'U2NET_PATH'),
+        'u2net_human_seg': (u2net.U2NET,
+                            '347c3d51b01528e5c6c071e3cff1cb55',
+                            '1-Yg0cxgrNhHP-016FPdp902BR-kSsA4P',
+                            'U2NET_PATH')
+    }[model_name]
 
     if model_name == "u2netp":
         net = u2net.U2NETP(3, 1)
@@ -59,10 +41,8 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "e4f636406ca4e2af789941e7f139ee2e"
         ):
-            download_file_from_google_drive(
-                "1rbSTGKAE-MTxBYHd-51l2hMOQPT_7EPy",
-                "u2netp.pth",
-                path,
+            utilities.download_file_from_google_drive(
+                model, path,
             )
 
     elif model_name == "u2net":
@@ -75,10 +55,8 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
         ):
-            download_file_from_google_drive(
-                "1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ",
-                "u2net.pth",
-                path,
+            utilities.download_file_from_google_drive(
+                model, path,
             )
 
     elif model_name == "u2net_human_seg":
@@ -91,10 +69,8 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
         ):
-            download_file_from_google_drive(
-                "1-Yg0cxgrNhHP-016FPdp902BR-kSsA4P",
-                "u2net_human_seg.pth",
-                path,
+            utilities.download_file_from_google_drive(
+                model, path,
             )
     else:
         print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
@@ -152,7 +128,6 @@ def preprocess(image):
 
 
 def predict(net, item):
-
     sample = preprocess(item)
 
     with torch.no_grad():
