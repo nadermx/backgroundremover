@@ -117,7 +117,6 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg"-tv -o "output.mov
 ## Todo
 
 - convert logic from video to image to utilize more GPU on image removal
-- remove duplicate imports from image and video of u2net models
 - clean up documentation a bit more
 - add ability to adjust and give feedback images or videos to datasets
 - other
