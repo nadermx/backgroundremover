@@ -281,15 +281,15 @@ def transparentvideooverimage(output, overlay, file_path,
         sp.run(shlex.split(cmd))
         print("Starting alphamerge")
         cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0][1]scale2ref[img][vid];[img]setsar=1[img];[vid]nullsink; [img][2]overlay=(W-w)/2:(H-h)/2' -shortest %s" % (
-        #cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[2:v][vid]overlay[out]' -map [out] -shortest %s" % (
             temp_image, file_path, temp_file, output)
         sp.run(shlex.split(cmd))
         print("Process finished")
     return
 
 def download_file_from_google_drive(model, path):
-    head, tail = os.path.split(path)
-    os.makedirs(head, exist_ok=True)
-    URL = "https://drive.google.com/uc?id=%s" % model[2]
+    if not os.path.exists(path):
+        head, tail = os.path.split(path)
+        os.makedirs(head, exist_ok=True)
+        URL = "https://drive.google.com/uc?id=%s" % model[2]
 
-    gdown.download(URL, path, quiet=False)
+        gdown.download(URL, path, quiet=False)

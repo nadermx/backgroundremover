@@ -8,15 +8,7 @@ import torch
 
 
 def main():
-    model_path = os.environ.get(
-        "U2NETP_PATH",
-        os.path.expanduser(os.path.join("~", ".u2net")),
-    )
-    print(model_path)
-    model_choices = [os.path.splitext(os.path.basename(x))[0] for x in set(glob.glob(model_path + "/*"))]
-    print('here', model_choices)
-    if len(model_choices) == 0:
-        model_choices = ["u2net", "u2net_human_seg", "u2netp"]
+    model_choices = ["u2net", "u2net_human_seg", "u2netp"]
 
     ap = argparse.ArgumentParser()
 
