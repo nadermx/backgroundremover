@@ -16,7 +16,7 @@ import torch.nn.functional
 from hsh.library.hash import Hasher
 from tqdm import tqdm
 from .u2net import detect, u2net
-from ..backgroundremover import utilities
+from . import utilities
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

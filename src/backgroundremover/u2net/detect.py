@@ -11,7 +11,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from . import data_loader, u2net
-from ...backgroundremover import utilities
+from .. import utilities
 
 def load_model(model_name: str = "u2net"):
     hasher = Hasher()
