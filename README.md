@@ -58,7 +58,7 @@ backgroundremover -i "/path/to/image.jpeg" -o "output.png"
 Sometimes it is possible to achieve better results by turning on alpha matting. Example:
 
 ```bash
-backgroundremover -i "/path/to/image.jpeg" a -ae 15 -o "output.png"
+backgroundremover -i "/path/to/image.jpeg" -a -ae 15 -o "output.png"
 ```
 change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
 ```bash
