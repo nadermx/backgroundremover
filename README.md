@@ -98,7 +98,7 @@ backgroundremover -i "/path/to/video.mp4" -fr 30 -tv -o "output.mov"
 Change the gpu batch size of the video (default is set to 1)
 
 ```bash
-backgroundremover -i "/path/to/video.mp4" -gp 4 -tv -o "output.mov"
+backgroundremover -i "/path/to/video.mp4" -gb 4 -tv -o "output.mov"
 ```
 
 Change the number of workers working on video (default is set to 1)
