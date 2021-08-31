@@ -116,6 +116,7 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg"-tv -o "output.mov
 - convert logic from video to image to utilize more GPU on image removal
 - clean up documentation a bit more
 - add ability to adjust and give feedback images or videos to datasets
+- add ability to realtime background removal for videos, for streaming
 - other
 
 ### Pull requests
