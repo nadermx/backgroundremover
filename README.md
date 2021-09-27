@@ -117,6 +117,8 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg"-tv -o "output.mov
 - clean up documentation a bit more
 - add ability to adjust and give feedback images or videos to datasets
 - add ability to realtime background removal for videos, for streaming
+- finish flask server api
+- add ability to use other models than u2net, ie your own.
 - other
 
 ### Pull requests
