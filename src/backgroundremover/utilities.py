@@ -373,6 +373,3 @@ def download_files_from_github(path, model_name):
             sp.run(["cat", part1.name, ">", path], stdout=sp.DEVNULL)
         finally:
             os.remove(part1.name)
-            os.remove(part2.name)
-            os.remove(part3.name)
-            os.remove(part4.name)
