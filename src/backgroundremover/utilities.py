@@ -11,6 +11,7 @@ from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
 import gdown
 from tqdm import tqdm
+import tempfile
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -281,15 +282,47 @@ def transparentvideooverimage(output, overlay, file_path,
         sp.run(shlex.split(cmd))
         print("Starting alphamerge")
         cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0][1]scale2ref[img][vid];[img]setsar=1[img];[vid]nullsink; [img][2]overlay=(W-w)/2:(H-h)/2' -shortest %s" % (
+        #cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[2:v][vid]overlay[out]' -map [out] -shortest %s" % (
             temp_image, file_path, temp_file, output)
         sp.run(shlex.split(cmd))
         print("Process finished")
     return
 
-def download_file_from_google_drive(model, path):
-    if not os.path.exists(path):
-        head, tail = os.path.split(path)
-        os.makedirs(head, exist_ok=True)
-        URL = "https://drive.google.com/uc?id=%s" % model[2]
+def download_files_from_github(path, model_name):
+    if model_name == "u2net":
+        part1 = tempfile.NamedTemporaryFile(delete=False)
+        part2 = tempfile.NamedTemporaryFile(delete=False)
+        part3 = tempfile.NamedTemporaryFile(delete=False)
+        part4 = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            print('download part1 of %s' % model_name)
+            part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2aa')
+            part1.write(part1_content.content)
+            part1.close()
+            print('finished downloading part 1 of %s' % model_name)
+            print('download part2 of %s' % model_name)
 
-        gdown.download(URL, path, quiet=False)
+            part2_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ab')
+            part2.write(part2_content.content)
+            part2.close()
+            print('finished downloading part 2 of %s' % model_name)
+            print('download part2 of %s' % model_name)
+
+            part3_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ac')
+            part3.write(part3_content.content)
+            part3.close()
+            print('finished downloading part 3 of %s' % model_name)
+            print('download part4 of %s' % model_name)
+
+            part4_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ad')
+            part4.write(part4_content.content)
+            part4.close()
+            print('finished downloading part 4 of %s' % model_name)
+
+            stuff = sp.run(["cat", part1.name, part2.name, part3.name, part4.name, ">", path], stdout=sp.DEVNULL)
+            print(stuff)
+        finally:
+            os.remove(part1.name)
+            os.remove(part2.name)
+            os.remove(part3.name)
+            os.remove(part4.name)

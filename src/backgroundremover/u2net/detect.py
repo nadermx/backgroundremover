@@ -41,8 +41,8 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "e4f636406ca4e2af789941e7f139ee2e"
         ):
-            utilities.download_file_from_google_drive(
-                model, path,
+            utilities.download_downloadfiles_from_github(
+                path, model_name
             )
 
     elif model_name == "u2net":
@@ -55,8 +55,8 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
         ):
-            utilities.download_file_from_google_drive(
-                model, path,
+            utilities.download_downloadfiles_from_github(
+                path, model_name
             )
 
     elif model_name == "u2net_human_seg":
@@ -69,9 +69,10 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
         ):
-            utilities.download_file_from_google_drive(
-                model, path,
+            utilities.download_downloadfiles_from_github(
+                path, model_name
             )
+
     else:
         print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
 
