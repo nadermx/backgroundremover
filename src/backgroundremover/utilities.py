@@ -361,3 +361,18 @@ def download_files_from_github(path, model_name):
             os.remove(part2.name)
             os.remove(part3.name)
             os.remove(part4.name)
+
+    if model_name == "u2netp":
+        part1 = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            print('download %s' % model_name)
+            part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2haa')
+            part1.write(part1_content.content)
+            part1.close()
+            print('finished downloading %s' % model_name)
+            sp.run(["cat", part1.name, ">", path], stdout=sp.DEVNULL)
+        finally:
+            os.remove(part1.name)
+            os.remove(part2.name)
+            os.remove(part3.name)
+            os.remove(part4.name)
