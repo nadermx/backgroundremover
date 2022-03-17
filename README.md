@@ -1,8 +1,8 @@
 # BackgroundRemover
-![Background Remover](https://backgroundremover.app/static/backgroundremoverexample.png)
+![Background Remover](https://raw.githubusercontent.com/nadermx/backgroundremover/main/examplegif/backgroundremoverexample.png)
 <img alt="background remover video" src="/examplegif/backgroundremoverprocessed.gif" height="200" /><br>
-BackgroundRemover is a command line tool to remove background from [video](https://backgroundremover.app/video)
-and [image](https://backgroundremover.app/image), made by [nadermx](https://john.nader.mx) to power [https://BackgroundRemover.app](https://backgroundremover.app). If you wonder why it was made read this [short blog post](https://johnathannader.com/my-first-open-source-project/).<br>
+BackgroundRemover is a command line tool to remove background from [video](https://backgroundremover.app/video/)
+and [image](https://backgroundremover.app/image/), made by [nadermx](https://john.nader.mx) to power [https://BackgroundRemover.app](https://backgroundremover.app). If you wonder why it was made read this [short blog post](https://johnathannader.com/my-first-open-source-project/).<br>
 
 
 ### Requirements
@@ -130,6 +130,7 @@ Accepted
 Give a link to our project [BackgroundRemover.app](https://backgroundremover.app) or this git, telling people that you like it or use it.
 #### bitcoin
 <a href="bitcoin:BC1Q80PSHGQGQR7WN3KAX59XWVMGQ9FTVWLA7DEW7W?label=backgroundremover&message=BackgroundRemover"><img src="https://backgroundremover.app/static/btc.png" alt="bc1q80pshgqgqr7wn3kax59xwvmgq9ftvwla7dew7w"></a>
+
 
 
 ### Reason for project
