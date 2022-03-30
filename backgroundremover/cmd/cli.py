@@ -126,7 +126,7 @@ def main():
         const=True,
         default=False,
         type=lambda x: bool(strtobool(x)),
-        help="Overlay transparent video over another video",
+        help="Overlay transparent video over another image",
     )
     ap.add_argument(
         "-tg",
