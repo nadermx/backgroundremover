@@ -69,7 +69,11 @@ backgroundremover -i "/path/to/video.mp4" -tv -o "output.mov"
 ```
 ### remove background from local video and overlay it over other video
 ```bash
-backgroundremover -i "/path/to/video.mp4" -tov -tv "/path/to/videtobeoverlayed.mp4" -o "output.mov"
+backgroundremover -i "/path/to/video.mp4" -tov "/path/to/videtobeoverlayed.mp4" -o "output.mov"
+```
+### remove background from local video and overlay it over an image
+```bash
+backgroundremover -i "/path/to/video.mp4" -toi "/path/to/videtobeoverlayed.mp4" -o "output.mov"
 ```
 
 ### remove background from video and make transparent gif
