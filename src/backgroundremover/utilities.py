@@ -12,6 +12,7 @@ import shlex
 import gdown
 from tqdm import tqdm
 import tempfile
+import requests
 
 multiprocessing.set_start_method('spawn', force=True)
 
