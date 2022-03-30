@@ -1,6 +1,6 @@
 # BackgroundRemover
-![Background Remover](https://raw.githubusercontent.com/nadermx/backgroundremover/main/examplegif/backgroundremoverexample.png)
-<img alt="background remover video" src="/examplegif/backgroundremoverprocessed.gif" height="200" /><br>
+![Background Remover](/examplefiles/backgroundremoverexample.png)
+<img alt="background remover video" src="/examplefiles/backgroundremoverprocessed.gif" height="200" /><br>
 BackgroundRemover is a command line tool to remove background from [image](https://github.com/nadermx/backgroundremover#image) and [video](https://github.com/nadermx/backgroundremover#video), made by [nadermx](https://john.nader.mx) to power [https://BackgroundRemover.app](https://backgroundremover.app). If you wonder why it was made read this [short blog post](https://johnathannader.com/my-first-open-source-project/).<br>
 
 
