@@ -1,14 +1,11 @@
 import errno
 import os
 import sys
-import gdown
 import numpy as np
-import requests
 import torch
 from hsh.library.hash import Hasher
 from PIL import Image
 from torchvision import transforms
-from tqdm import tqdm
 
 from . import data_loader, u2net
 from .. import utilities

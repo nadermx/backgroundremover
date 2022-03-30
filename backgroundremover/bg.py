@@ -1,4 +1,3 @@
-import functools
 import io
 import os
 import typing
@@ -9,12 +8,10 @@ from pymatting.util.util import stack_images
 from scipy.ndimage.morphology import binary_erosion
 import moviepy.editor as mpy
 import numpy as np
-import requests
 import torch
 import torch.nn.functional
 import torch.nn.functional
 from hsh.library.hash import Hasher
-from tqdm import tqdm
 from .u2net import detect, u2net
 from . import utilities
 

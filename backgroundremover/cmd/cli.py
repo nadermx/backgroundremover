@@ -1,10 +1,8 @@
 import argparse
-import glob
 import os
 from distutils.util import strtobool
 from .. import utilities
 from ..bg import remove
-import torch
 
 
 def main():
@@ -189,48 +187,48 @@ def main():
     if args.input.name.rsplit('.', 1)[1] in ['mp4', 'mov', 'webm', 'ogg', 'gif']:
         if args.mattekey:
             utilities.matte_key(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
-                      worker_nodes=args.workernodes,
-                      gpu_batchsize=args.gpubatchsize,
-                      model_name=args.model,
-                      frame_limit=args.framelimit,
-                      framerate=args.framerate)
+                                worker_nodes=args.workernodes,
+                                gpu_batchsize=args.gpubatchsize,
+                                model_name=args.model,
+                                frame_limit=args.framelimit,
+                                framerate=args.framerate)
         elif args.transparentvideo:
             utilities.transparentvideo(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
-                             worker_nodes=args.workernodes,
-                             gpu_batchsize=args.gpubatchsize,
-                             model_name=args.model,
-                             frame_limit=args.framelimit,
-                             framerate=args.framerate)
+                                       worker_nodes=args.workernodes,
+                                       gpu_batchsize=args.gpubatchsize,
+                                       model_name=args.model,
+                                       frame_limit=args.framelimit,
+                                       framerate=args.framerate)
         elif args.transparentvideoovervideo:
             utilities.transparentvideoovervideo(os.path.abspath(args.output.name), os.path.abspath(args.backgroundvideo.name),
-                                 os.path.abspath(args.input.name),
-                                 worker_nodes=args.workernodes,
-                                 gpu_batchsize=args.gpubatchsize,
-                                 model_name=args.model,
-                                 frame_limit=args.framelimit,
-                                 framerate=args.framerate)
+                                                os.path.abspath(args.input.name),
+                                                worker_nodes=args.workernodes,
+                                                gpu_batchsize=args.gpubatchsize,
+                                                model_name=args.model,
+                                                frame_limit=args.framelimit,
+                                                framerate=args.framerate)
         elif args.transparentvideooverimage:
             utilities.transparentvideooverimage(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name),
-                                 os.path.abspath(args.input.name),
-                                 worker_nodes=args.workernodes,
-                                 gpu_batchsize=args.gpubatchsize,
-                                 model_name=args.model,
-                                 frame_limit=args.framelimit,
-                                 framerate=args.framerate)
+                                                os.path.abspath(args.input.name),
+                                                worker_nodes=args.workernodes,
+                                                gpu_batchsize=args.gpubatchsize,
+                                                model_name=args.model,
+                                                frame_limit=args.framelimit,
+                                                framerate=args.framerate)
         elif args.transparentgif:
             utilities.transparentgif(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
-                           worker_nodes=args.workernodes,
-                           gpu_batchsize=args.gpubatchsize,
-                           model_name=args.model,
-                           frame_limit=args.framelimit,
-                           framerate=args.framerate)
+                                     worker_nodes=args.workernodes,
+                                     gpu_batchsize=args.gpubatchsize,
+                                     model_name=args.model,
+                                     frame_limit=args.framelimit,
+                                     framerate=args.framerate)
         elif args.transparentgifwithbackground:
             utilities.transparentgifwithbackground(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name), os.path.abspath(args.input.name),
-                              worker_nodes=args.workernodes,
-                              gpu_batchsize=args.gpubatchsize,
-                              model_name=args.model,
-                              frame_limit=args.framelimit,
-                              framerate=args.framerate)
+                                                   worker_nodes=args.workernodes,
+                                                   gpu_batchsize=args.gpubatchsize,
+                                                   model_name=args.model,
+                                                   frame_limit=args.framelimit,
+                                                   framerate=args.framerate)
 
     else:
         print(args.output.name)
