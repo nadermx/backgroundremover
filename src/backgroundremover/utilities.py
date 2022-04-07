@@ -221,7 +221,7 @@ def transparentvideo(output, file_path,
                   prefetched_batches,
                   framerate)
         print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -nostats -loglevel 0 -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1' -c:v qtrle -shortest %s" % (
+        cmd = "nice -10 ffmpeg -y -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' %s" % (
             file_path, temp_file, output)
         process = sp.Popen(cmd, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
         stdout, stderr = process.communicate()
