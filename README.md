@@ -1,11 +1,7 @@
 # BackgroundRemover
-
-BackgroundRemover is a command line tool to remove background from [video](https://backgroundremover.app/video)
-and [image](https://backgroundremover.app/image), brought to you
-by [https://BackgroundRemover.app](https://backgroundremover.app) which is an app made by [nadermx](https://john.nader.mx) powered by this tool
-
-<img alt="background remover image" src="https://backgroundremover.app/static/backgroundremoverexample.png" height="200" />
-<img alt="background remover video" src="/examplegif/backgroundremoverprocessed.gif" height="200" />
+![Background Remover](/examplefiles/backgroundremoverexample.png)
+<img alt="background remover video" src="/examplefiles/backgroundremoverprocessed.gif" height="200" /><br>
+BackgroundRemover is a command line tool to remove background from [image](https://github.com/nadermx/backgroundremover#image) and [video](https://github.com/nadermx/backgroundremover#video), made by [nadermx](https://john.nader.mx) to power [https://BackgroundRemover.app](https://backgroundremover.app). If you wonder why it was made read this [short blog post](https://johnathannader.com/my-first-open-source-project/).<br>
 
 
 ### Requirements
@@ -43,7 +39,7 @@ To Install backgroundremover, install it from pypi
 pip install --upgrade pip
 pip install backgroundremover
 ```
-
+Please note that when you first run the program, it will check to see if you have the u2net models, if you do not, it will get them from u2net's google drive, as they say too [here](https://github.com/xuebinqin/U-2-Net#usage-for-salient-object-detection), and in this repo the code that pulls it is [here](https://github.com/nadermx/backgroundremover/blob/main/src/backgroundremover/utilities.py#L289)
 # Usage as a cli
 ## Image
 
@@ -58,7 +54,7 @@ backgroundremover -i "/path/to/image.jpeg" -o "output.png"
 Sometimes it is possible to achieve better results by turning on alpha matting. Example:
 
 ```bash
-backgroundremover -i "/path/to/image.jpeg" a -ae 15 -o "output.png"
+backgroundremover -i "/path/to/image.jpeg" -a -ae 15 -o "output.png"
 ```
 change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
 ```bash
@@ -73,7 +69,11 @@ backgroundremover -i "/path/to/video.mp4" -tv -o "output.mov"
 ```
 ### remove background from local video and overlay it over other video
 ```bash
-backgroundremover -i "/path/to/video.mp4" -tov -tv "/path/to/videtobeoverlayed.mp4" -o "output.mov"
+backgroundremover -i "/path/to/video.mp4" -tov "/path/to/videtobeoverlayed.mp4" -o "output.mov"
+```
+### remove background from local video and overlay it over an image
+```bash
+backgroundremover -i "/path/to/video.mp4" -toi "/path/to/videtobeoverlayed.mp4" -o "output.mov"
 ```
 
 ### remove background from video and make transparent gif
@@ -98,10 +98,16 @@ Change the framerate of the video (default is set to 30)
 backgroundremover -i "/path/to/video.mp4" -fr 30 -tv -o "output.mov"
 ```
 
+Set total number of frames of the video (default is set to -1, ie the remove background from full video)
+
+```bash
+backgroundremover -i "/path/to/video.mp4" -fl 150 -tv -o "output.mov"
+```
+
 Change the gpu batch size of the video (default is set to 1)
 
 ```bash
-backgroundremover -i "/path/to/video.mp4" -gp 4 -tv -o "output.mov"
+backgroundremover -i "/path/to/video.mp4" -gb 4 -tv -o "output.mov"
 ```
 
 Change the number of workers working on video (default is set to 1)
@@ -109,9 +115,9 @@ Change the number of workers working on video (default is set to 1)
 ```bash
 backgroundremover -i "/path/to/video.mp4" -wn 4 -tv -o "output.mov"
 ```
-change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
+change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg` and limit the frames to 150
 ```bash
-backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg"-tv -o "output.mov"
+backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg" -fl 150 -tv -o "output.mov"
 ```
 
 ## Todo
@@ -119,6 +125,9 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg"-tv -o "output.mov
 - convert logic from video to image to utilize more GPU on image removal
 - clean up documentation a bit more
 - add ability to adjust and give feedback images or videos to datasets
+- add ability to realtime background removal for videos, for streaming
+- finish flask server api
+- add ability to use other models than u2net, ie your own.
 - other
 
 ### Pull requests
@@ -128,6 +137,10 @@ Accepted
 ### If you like this library
 
 Give a link to our project [BackgroundRemover.app](https://backgroundremover.app) or this git, telling people that you like it or use it.
+#### bitcoin
+<a href="bitcoin:BC1Q80PSHGQGQR7WN3KAX59XWVMGQ9FTVWLA7DEW7W?label=backgroundremover&message=BackgroundRemover">bc1q80pshgqgqr7wn3kax59xwvmgq9ftvwla7dew7w</a>
+
+
 
 ### Reason for project
 
