@@ -313,6 +313,10 @@ def download_files_from_github(path, model_name):
         part3 = tempfile.NamedTemporaryFile(delete=False)
         part4 = tempfile.NamedTemporaryFile(delete=False)
         try:
+            os.makedirs("~/.u2net")
+        except:
+            print("u2net folder made or already exists")
+        try:
             print('download part1 of %s' % model_name)
             part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2aa')
             part1.write(part1_content.content)
