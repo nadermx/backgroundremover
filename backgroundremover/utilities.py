@@ -199,7 +199,8 @@ def transparentgifwithbackground(output, overlay, file_path,
                   framerate)
         print("Starting alphamerge")
         cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' -shortest %s" % (
-            file_path, temp_file, overlay, output)
+            file_path, temp_file, 
+            lay, output)
         sp.run(shlex.split(cmd))
         print("Process finished")
 
@@ -253,7 +254,7 @@ def transparentvideoovervideo(output, overlay, file_path,
                   prefetched_batches,
                   framerate)
         print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay=shortest=1[out]' -map [out] -shortest %s" % (
+        cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay[out]' -map [out] -shortest %s" % (
             file_path, temp_file, overlay, output)
         sp.run(shlex.split(cmd))
         print("Process finished")
