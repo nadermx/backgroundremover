@@ -6,13 +6,11 @@ import time
 import ffmpeg
 import numpy as np
 import torch
-import tempfile
 from .bg import DEVICE, Net, iter_frames, remove_many
 import shlex
-import gdown
-from tqdm import tqdm
 import tempfile
 import requests
+from pathlib import Path
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -164,19 +162,20 @@ def transparentgif(output, file_path,
                    frame_limit=-1,
                    prefetched_batches=4,
                    framerate=-1):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
-        matte_key(temp_file, file_path,
-                  worker_nodes,
-                  gpu_batchsize,
-                  model_name,
-                  frame_limit,
-                  prefetched_batches,
-                  framerate)
-        cmd = "nice -10 ffmpeg -y -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' -shortest %s" % (
-            file_path, temp_file, output)
-        sp.run(shlex.split(cmd))
-        print("Process finished")
+    temp_dir = tempfile.TemporaryDirectory()
+    tmpdirname = Path(temp_dir.name)
+    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    matte_key(temp_file, file_path,
+              worker_nodes,
+              gpu_batchsize,
+              model_name,
+              frame_limit,
+              prefetched_batches,
+              framerate)
+    cmd = "nice -10 ffmpeg -y -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' -shortest %s" % (
+        file_path, temp_file, output)
+    sp.run(shlex.split(cmd))
+    print("Process finished")
 
     return
 
@@ -188,22 +187,25 @@ def transparentgifwithbackground(output, overlay, file_path,
                       frame_limit=-1,
                       prefetched_batches=4,
                       framerate=-1):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
-        matte_key(temp_file, file_path,
-                  worker_nodes,
-                  gpu_batchsize,
-                  model_name,
-                  frame_limit,
-                  prefetched_batches,
-                  framerate)
-        print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' -shortest %s" % (
-            file_path, temp_file, 
-            lay, output)
-        sp.run(shlex.split(cmd))
-        print("Process finished")
-
+    temp_dir = tempfile.TemporaryDirectory()
+    tmpdirname = Path(temp_dir.name)
+    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    matte_key(temp_file, file_path,
+              worker_nodes,
+              gpu_batchsize,
+              model_name,
+              frame_limit,
+              prefetched_batches,
+              framerate)
+    print("Starting alphamerge")
+    cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse' -shortest %s" % (
+        file_path, temp_file, overlay, output)
+    sp.run(shlex.split(cmd))
+    print("Process finished")
+    try:
+        temp_dir.cleanup()
+    except PermissionError:
+        pass
     return
 
 
@@ -214,26 +216,30 @@ def transparentvideo(output, file_path,
                      frame_limit=-1,
                      prefetched_batches=4,
                      framerate=-1):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
-        matte_key(temp_file, file_path,
-                  worker_nodes,
-                  gpu_batchsize,
-                  model_name,
-                  frame_limit,
-                  prefetched_batches,
-                  framerate)
-        print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -nostats -loglevel 0 -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1' -c:v qtrle -shortest %s" % (
-            file_path, temp_file, output)
-        process = sp.Popen(cmd, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
-        stdout, stderr = process.communicate()
-        print('after call')
+    temp_dir = tempfile.TemporaryDirectory()
+    tmpdirname = Path(temp_dir.name)
+    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    matte_key(temp_file, file_path,
+              worker_nodes,
+              gpu_batchsize,
+              model_name,
+              frame_limit,
+              prefetched_batches,
+              framerate)
+    print("Starting alphamerge")
+    cmd = "nice -10 ffmpeg -y -nostats -loglevel 0 -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1' -c:v qtrle -shortest %s" % (
+        file_path, temp_file, output)
+    process = sp.Popen(cmd, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
+    stdout, stderr = process.communicate()
+    print('after call')
 
-        if stderr:
-            return "ERROR: %s" % stderr.decode("utf-8")
-        print("Process finished")
-
+    if stderr:
+        return "ERROR: %s" % stderr.decode("utf-8")
+    print("Process finished")
+    try:
+        temp_dir.cleanup()
+    except PermissionError:
+        pass
     return
 
 
@@ -244,20 +250,25 @@ def transparentvideoovervideo(output, overlay, file_path,
                          frame_limit=-1,
                          prefetched_batches=4,
                          framerate=-1):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
-        matte_key(temp_file, file_path,
-                  worker_nodes,
-                  gpu_batchsize,
-                  model_name,
-                  frame_limit,
-                  prefetched_batches,
-                  framerate)
-        print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay[out]' -map [out] -shortest %s" % (
-            file_path, temp_file, overlay, output)
-        sp.run(shlex.split(cmd))
-        print("Process finished")
+    temp_dir = tempfile.TemporaryDirectory()
+    tmpdirname = Path(temp_dir.name)
+    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    matte_key(temp_file, file_path,
+              worker_nodes,
+              gpu_batchsize,
+              model_name,
+              frame_limit,
+              prefetched_batches,
+              framerate)
+    print("Starting alphamerge")
+    cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay=shortest=1[out]' -map [out] -shortest %s" % (
+        file_path, temp_file, overlay, output)
+    sp.run(shlex.split(cmd))
+    print("Process finished")
+    try:
+        temp_dir.cleanup()
+    except PermissionError:
+        pass
     return
 
 
@@ -268,26 +279,31 @@ def transparentvideooverimage(output, overlay, file_path,
                          frame_limit=-1,
                          prefetched_batches=4,
                          framerate=-1):
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
-        matte_key(temp_file, file_path,
-                  worker_nodes,
-                  gpu_batchsize,
-                  model_name,
-                  frame_limit,
-                  prefetched_batches,
-                  framerate)
-        print("Scale image")
-        temp_image = os.path.abspath("%s/new.jpg" % tmpdirname)
-        cmd = "nice -10 ffmpeg -i %s -i %s -filter_complex 'scale2ref[img][vid];[img]setsar=1;[vid]nullsink' -q:v 2 %s" % (
-            overlay, file_path, temp_image)
-        sp.run(shlex.split(cmd))
-        print("Starting alphamerge")
-        cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0][1]scale2ref[img][vid];[img]setsar=1[img];[vid]nullsink; [img][2]overlay=(W-w)/2:(H-h)/2' -shortest %s" % (
-        #cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[2:v][vid]overlay[out]' -map [out] -shortest %s" % (
-            temp_image, file_path, temp_file, output)
-        sp.run(shlex.split(cmd))
-        print("Process finished")
+    temp_dir = tempfile.TemporaryDirectory()
+    tmpdirname = Path(temp_dir.name)
+    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    matte_key(temp_file, file_path,
+              worker_nodes,
+              gpu_batchsize,
+              model_name,
+              frame_limit,
+              prefetched_batches,
+              framerate)
+    print("Scale image")
+    temp_image = os.path.abspath("%s/new.jpg" % tmpdirname)
+    cmd = "nice -10 ffmpeg -i %s -i %s -filter_complex 'scale2ref[img][vid];[img]setsar=1;[vid]nullsink' -q:v 2 %s" % (
+        overlay, file_path, temp_image)
+    sp.run(shlex.split(cmd))
+    print("Starting alphamerge")
+    cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0][1]scale2ref[img][vid];[img]setsar=1[img];[vid]nullsink; [img][2]overlay=(W-w)/2:(H-h)/2' -shortest %s" % (
+    #cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[2:v][vid]overlay[out]' -map [out] -shortest %s" % (
+        temp_image, file_path, temp_file, output)
+    sp.run(shlex.split(cmd))
+    print("Process finished")
+    try:
+        temp_dir.cleanup()
+    except PermissionError:
+        pass
     return
 
 def download_files_from_github(path, model_name):
