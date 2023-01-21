@@ -305,93 +305,43 @@ def transparentvideooverimage(output, overlay, file_path,
     except PermissionError:
         pass
     return
-
 def download_files_from_github(path, model_name):
+    if model_name not in ["u2net", "u2net_human_seg"]:
+        print("Invalid model name, please use 'u2net' or 'u2net_human_seg'")
+        return
+    
+    parts = []
+    urls = []
     if model_name == "u2net":
-        part1 = tempfile.NamedTemporaryFile(delete=False)
-        part2 = tempfile.NamedTemporaryFile(delete=False)
-        part3 = tempfile.NamedTemporaryFile(delete=False)
-        part4 = tempfile.NamedTemporaryFile(delete=False)
-        try:
-            os.makedirs("~/.u2net")
-        except:
-            print("u2net folder made or already exists")
-        try:
-            print('download part1 of %s' % model_name)
-            part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2aa')
-            part1.write(part1_content.content)
-            part1.close()
-            print('finished downloading part 1 of %s' % model_name)
-            print('download part2 of %s' % model_name)
+        urls = ['https://github.com/nadermx/backgroundremover/raw/main/models/u2aa',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2ab',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2ac',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2ad']
+    elif model_name == "u2net_human_seg":
+        urls = ['https://github.com/nadermx/backgroundremover/raw/main/models/u2haa',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2hab',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2hac',
+                'https://github.com/nadermx/backgroundremover/raw/main/models/u2had']
 
-            part2_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ab')
-            part2.write(part2_content.content)
-            part2.close()
-            print('finished downloading part 2 of %s' % model_name)
-            print('download part2 of %s' % model_name)
+    try:
+        os.makedirs(os.path.expanduser("~/.u2net"), exist_ok=True)
+    except Exception as e:
+        print(f"Error creating directory: {e}")
+        return
 
-            part3_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ac')
-            part3.write(part3_content.content)
-            part3.close()
-            print('finished downloading part 3 of %s' % model_name)
-            print('download part4 of %s' % model_name)
+    try:
+        for i, url in enumerate(urls):
+            part = tempfile.NamedTemporaryFile(delete=False)
+            print(f'downloading part {i+1} of {model_name}')
+            part_content = requests.get(url)
+            part.write(part_content.content)
+            parts.append(part)
+            print(f'finished downloading part {i+1} of {model_name}')
 
-            part4_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2ad')
-            part4.write(part4_content.content)
-            part4.close()
-            print('finished downloading part 4 of %s' % model_name)
-
-            sp.run(["cat", part1.name, part2.name, part3.name, part4.name, ">", path], stdout=sp.DEVNULL)
-        finally:
-            os.remove(part1.name)
-            os.remove(part2.name)
-            os.remove(part3.name)
-            os.remove(part4.name)
-    if model_name == "u2net_human_seg":
-        part1 = tempfile.NamedTemporaryFile(delete=False)
-        part2 = tempfile.NamedTemporaryFile(delete=False)
-        part3 = tempfile.NamedTemporaryFile(delete=False)
-        part4 = tempfile.NamedTemporaryFile(delete=False)
-        try:
-            print('download part1 of %s' % model_name)
-            part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2haa')
-            part1.write(part1_content.content)
-            part1.close()
-            print('finished downloading part 1 of %s' % model_name)
-            print('download part2 of %s' % model_name)
-
-            part2_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2hab')
-            part2.write(part2_content.content)
-            part2.close()
-            print('finished downloading part 2 of %s' % model_name)
-            print('download part2 of %s' % model_name)
-
-            part3_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2hac')
-            part3.write(part3_content.content)
-            part3.close()
-            print('finished downloading part 3 of %s' % model_name)
-            print('download part4 of %s' % model_name)
-
-            part4_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2had')
-            part4.write(part4_content.content)
-            part4.close()
-            print('finished downloading part 4 of %s' % model_name)
-
-            sp.run(["cat", part1.name, part2.name, part3.name, part4.name, ">", path], stdout=sp.DEVNULL)
-        finally:
-            os.remove(part1.name)
-            os.remove(part2.name)
-            os.remove(part3.name)
-            os.remove(part4.name)
-
-    if model_name == "u2netp":
-        part1 = tempfile.NamedTemporaryFile(delete=False)
-        try:
-            print('download %s' % model_name)
-            part1_content = requests.get('https://github.com/nadermx/backgroundremover/raw/main/models/u2haa')
-            part1.write(part1_content.content)
-            part1.close()
-            print('finished downloading %s' % model_name)
-            sp.run(["cat", part1.name, ">", path], stdout=sp.DEVNULL)
-        finally:
-            os.remove(part1.name)
+        with open(path, 'wb') as out_file:
+            for part in parts:
+                with open(part.name, 'rb') as in_file:
+                    out_file.write(in_file.read())
+    finally:
+        for part in parts:
+            os.remove(part.name)
