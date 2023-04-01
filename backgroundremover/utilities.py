@@ -305,12 +305,12 @@ def transparentvideooverimage(output, overlay, file_path,
     except PermissionError:
         pass
     return
+
 def download_files_from_github(path, model_name):
     if model_name not in ["u2net", "u2net_human_seg"]:
         print("Invalid model name, please use 'u2net' or 'u2net_human_seg'")
         return
-    
-    parts = []
+    print(f"downloading model [{model_name}] to {path} ...")
     urls = []
     if model_name == "u2net":
         urls = ['https://github.com/nadermx/backgroundremover/raw/main/models/u2aa',
@@ -330,18 +330,13 @@ def download_files_from_github(path, model_name):
         return
 
     try:
-        for i, url in enumerate(urls):
-            part = tempfile.NamedTemporaryFile(delete=False)
-            print(f'downloading part {i+1} of {model_name}')
-            part_content = requests.get(url)
-            part.write(part_content.content)
-            parts.append(part)
-            print(f'finished downloading part {i+1} of {model_name}')
 
         with open(path, 'wb') as out_file:
-            for part in parts:
-                with open(part.name, 'rb') as in_file:
-                    out_file.write(in_file.read())
+            for i, url in enumerate(urls):
+                print(f'downloading part {i+1} of {model_name}')
+                part_content = requests.get(url)
+                out_file.write(part_content.content)
+                print(f'finished downloading part {i+1} of {model_name}')
+
     finally:
-        for part in parts:
-            os.remove(part.name)
+        print()
