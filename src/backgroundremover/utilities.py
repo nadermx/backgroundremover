@@ -12,7 +12,7 @@ import tempfile
 import requests
 from pathlib import Path
 
-multiprocessing.set_start_method('spawn', force=True)
+# multiprocessing.set_start_method('spawn', force=True)
 
 
 def worker(worker_nodes,
