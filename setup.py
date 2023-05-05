@@ -23,7 +23,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     keywords="remove, background, u2net, remove background, background remover",
-    packages=find_packages(where="backgroundremover"),
+    packages=["backgroundremover"],
     python_requires=">=3.6, <4",
     install_requires=requireds,
     entry_points={
