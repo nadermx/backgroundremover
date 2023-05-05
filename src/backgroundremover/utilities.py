@@ -74,24 +74,10 @@ def matte_key(output, file_path,
     results_dict = manager.dict()
     frames_dict = manager.dict()
 
-    print(file_path)
 
     info = ffmpeg.probe(file_path)
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-select_streams",
-        "v:0",
-        "-count_packets",
-        "-show_entries",
-        "stream=nb_read_packets",
-        "-of",
-        "csv=p=0",
-        file_path
-    ]
-    output = sp.check_output(cmd, universal_newlines=True)
-    total_frames = int(output)
+    total_frames = int(info["streams"][0]["nb_frames"])
+
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
@@ -177,7 +163,7 @@ def transparentgif(output, file_path,
                    framerate=-1):
     temp_dir = tempfile.TemporaryDirectory()
     tmpdirname = Path(temp_dir.name)
-    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    temp_file = os.path.abspath(os.path.join(tmpdirname, "matte.mp4"))
     matte_key(temp_file, file_path,
               worker_nodes,
               gpu_batchsize,
@@ -202,7 +188,7 @@ def transparentgifwithbackground(output, overlay, file_path,
                       framerate=-1):
     temp_dir = tempfile.TemporaryDirectory()
     tmpdirname = Path(temp_dir.name)
-    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    temp_file = os.path.abspath(os.path.join(tmpdirname, "matte.mp4"))
     matte_key(temp_file, file_path,
               worker_nodes,
               gpu_batchsize,
@@ -231,7 +217,7 @@ def transparentvideo(output, file_path,
                      framerate=-1):
     temp_dir = tempfile.TemporaryDirectory()
     tmpdirname = Path(temp_dir.name)
-    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    temp_file = os.path.abspath(os.path.join(tmpdirname, "matte.mp4"))
     matte_key(temp_file, file_path,
               worker_nodes,
               gpu_batchsize,
@@ -265,7 +251,7 @@ def transparentvideoovervideo(output, overlay, file_path,
                          framerate=-1):
     temp_dir = tempfile.TemporaryDirectory()
     tmpdirname = Path(temp_dir.name)
-    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    temp_file = os.path.abspath(os.path.join(tmpdirname, "matte.mp4"))
     matte_key(temp_file, file_path,
               worker_nodes,
               gpu_batchsize,
@@ -294,7 +280,7 @@ def transparentvideooverimage(output, overlay, file_path,
                          framerate=-1):
     temp_dir = tempfile.TemporaryDirectory()
     tmpdirname = Path(temp_dir.name)
-    temp_file = os.path.abspath("%s/matte.mp4" % tmpdirname)
+    temp_file = os.path.abspath(os.path.join(tmpdirname, "matte.mp4"))
     matte_key(temp_file, file_path,
               worker_nodes,
               gpu_batchsize,
@@ -308,8 +294,7 @@ def transparentvideooverimage(output, overlay, file_path,
         overlay, file_path, temp_image)
     sp.run(shlex.split(cmd))
     print("Starting alphamerge")
-    cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0][1]scale2ref[img][vid];[img]setsar=1[img];[vid]nullsink; [img][2]overlay=(W-w)/2:(H-h)/2' -shortest %s" % (
-    #cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[2:v][vid]overlay[out]' -map [out] -shortest %s" % (
+    cmd = "nice -10 ffmpeg -y -i %s -i %s -i %s -filter_complex '[0:v]scale2ref=oh*mdar:ih[bg];[1:v]scale2ref=oh*mdar:ih[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2:shortest=1[out]' -map [out] -shortest %s" % (
         temp_image, file_path, temp_file, output)
     sp.run(shlex.split(cmd))
     print("Process finished")

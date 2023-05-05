@@ -69,7 +69,6 @@ def load_model(model_name: str = "u2net"):
             utilities.download_files_from_github(
                 path, model_name
             )
-
     else:
         print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
 

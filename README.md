@@ -36,9 +36,13 @@ sudo apt install ffmpeg python3.6-dev
 To run code without installation:
 
 ```bash
-python.exe -m backgroundremover.cmd.cli arguments...
+python -m src.backgroundremover.cli arguments...
 ```
+and for windows
+```bash
+python.exe -m src.backgroundremover.cli arguments...
 
+```
 ### Installation
 
 To Install backgroundremover, install it from pypi
