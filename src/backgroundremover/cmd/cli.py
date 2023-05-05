@@ -3,7 +3,7 @@ import os
 from distutils.util import strtobool
 from .. import utilities
 from ..bg import remove
-import torch
+
 
 def main():
     model_choices = ["u2net", "u2net_human_seg", "u2netp"]
@@ -249,5 +249,5 @@ def main():
 
 
 if __name__ == "__main__":
-    torch.multiprocessing.set_start_method('spawn', force=True)
+    # torch.multiprocessing.set_start_method('spawn')
     main()

@@ -12,7 +12,7 @@ import tempfile
 import requests
 from pathlib import Path
 
-# multiprocessing.set_start_method('spawn', force=True)
+multiprocessing.set_start_method('spawn', force=True)
 
 
 def worker(worker_nodes,
@@ -89,8 +89,8 @@ def matte_key(output, file_path,
         "csv=p=0",
         file_path
     ]
-    output = sp.check_output(cmd, universal_newlines=True)
-    total_frames = int(output)
+    framerate_output = sp.check_output(cmd, universal_newlines=True)
+    total_frames = int(framerate_output)
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
