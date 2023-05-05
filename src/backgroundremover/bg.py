@@ -1,4 +1,3 @@
-import functools
 import io
 import os
 import typing
@@ -9,12 +8,10 @@ from pymatting.util.util import stack_images
 from scipy.ndimage.morphology import binary_erosion
 import moviepy.editor as mpy
 import numpy as np
-import requests
 import torch
 import torch.nn.functional
 import torch.nn.functional
 from hsh.library.hash import Hasher
-from tqdm import tqdm
 from .u2net import detect, u2net
 from . import utilities
 
@@ -48,9 +45,8 @@ class Net(torch.nn.Module):
             )
             if (
                 not os.path.exists(path)
-                or hasher.md5(path) != "e4f636406ca4e2af789941e7f139ee2e"
             ):
-                utilities.download_file_from_google_drive(
+                utilities.download_files_from_github(
                     model, path,
                 )
 
@@ -62,9 +58,8 @@ class Net(torch.nn.Module):
             )
             if (
                 not os.path.exists(path)
-                or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
             ):
-                utilities.download_file_from_google_drive(
+                utilities.download_files_from_github(
                     model, path,
                 )
 
@@ -76,9 +71,8 @@ class Net(torch.nn.Module):
             )
             if (
                 not os.path.exists(path)
-                or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
             ):
-                utilities.download_file_from_google_drive(
+                utilities.download_files_from_github(
                     model, path,
                 )
         else:
