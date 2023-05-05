@@ -13,7 +13,7 @@ import torch.nn.functional
 import torch.nn.functional
 from hsh.library.hash import Hasher
 from .u2net import detect, u2net
-from . import utilities
+import utilities
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

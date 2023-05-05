@@ -8,7 +8,8 @@ from PIL import Image
 from torchvision import transforms
 
 from . import data_loader, u2net
-from .. import utilities
+import utilities
+
 
 def load_model(model_name: str = "u2net"):
     hasher = Hasher()

@@ -1,7 +1,7 @@
 import argparse
 import os
 from distutils.util import strtobool
-from .. import utilities
+import utilities
 from ..bg import remove
 
 
