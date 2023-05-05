@@ -11,7 +11,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="backgroundremover",
-    version="0.2.0",
+    version="0.2.1",
     description="Background remover from image and video",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -23,7 +23,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     keywords="remove, background, u2net, remove background, background remover",
-    packages=["backgroundremover"],
+    packages=find_packages(),
     python_requires=">=3.6, <4",
     install_requires=requireds,
     entry_points={
