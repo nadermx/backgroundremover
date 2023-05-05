@@ -76,8 +76,21 @@ def matte_key(output, file_path,
 
 
     info = ffmpeg.probe(file_path)
-    total_frames = int(info["streams"][0]["nb_frames"])
-
+    cmd = [
+        "ffprobe",
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-count_packets",
+        "-show_entries",
+        "stream=nb_read_packets",
+        "-of",
+        "csv=p=0",
+        file_path
+    ]
+    output = sp.check_output(cmd, universal_newlines=True)
+    total_frames = int(output)
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
