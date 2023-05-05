@@ -13,7 +13,7 @@ import torch.nn.functional
 import torch.nn.functional
 from hsh.library.hash import Hasher
 from .u2net import detect, u2net
-import utilities
+from . import utilities
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -47,7 +47,7 @@ class Net(torch.nn.Module):
                 not os.path.exists(path)
             ):
                 utilities.download_files_from_github(
-                    model, path,
+                    path, model_name
                 )
 
         elif model_name == "u2net":
@@ -58,9 +58,10 @@ class Net(torch.nn.Module):
             )
             if (
                 not os.path.exists(path)
+                #or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
             ):
                 utilities.download_files_from_github(
-                    model, path,
+                    path, model_name
                 )
 
         elif model_name == "u2net_human_seg":
@@ -71,9 +72,10 @@ class Net(torch.nn.Module):
             )
             if (
                 not os.path.exists(path)
+                #or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
             ):
                 utilities.download_files_from_github(
-                    model, path,
+                    path, model_name
                 )
         else:
             print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
