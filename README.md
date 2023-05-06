@@ -50,7 +50,7 @@ To Install backgroundremover, install it from pypi
 pip install --upgrade pip
 pip install backgroundremover
 ```
-Please note that when you first run the program, it will check to see if you have the u2net models, if you do not, it will get them from u2net's google drive, as they say too [here](https://github.com/xuebinqin/U-2-Net#usage-for-salient-object-detection), and in this repo the code that pulls it is [here](https://github.com/nadermx/backgroundremover/blob/main/src/backgroundremover/utilities.py#L289)
+Please note that when you first run the program, it will check to see if you have the u2net models, if you do not, it will pull them from this repo
 # Usage as a cli
 ## Image
 
@@ -177,4 +177,5 @@ We made it our own package after merging together parts of others, adding in a f
 - Copyright (c) 2020-present [Dr. Tim Scarfe](https://github.com/ecsplendid)
 - Copyright (c) 2020-present [Daniel Gatis](https://github.com/danielgatis)
 
-Licensed under [MIT License](./LICENSE.txt)
+Code Licensed under [MIT License](./LICENSE.txt)
+Models Licensed under [Apache License 2.0](./models/license)
