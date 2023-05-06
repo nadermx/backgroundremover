@@ -1,7 +1,6 @@
 certifi>=2021.5.30
 charset-normalizer>=2.0.4
 filelock>=3.0.12
-gdown>=3.13.0
 idna>=3.2
 PySocks>=1.7.1
 six>=1.16.0
