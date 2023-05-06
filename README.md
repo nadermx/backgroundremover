@@ -177,4 +177,5 @@ We made it our own package after merging together parts of others, adding in a f
 - Copyright (c) 2020-present [Dr. Tim Scarfe](https://github.com/ecsplendid)
 - Copyright (c) 2020-present [Daniel Gatis](https://github.com/danielgatis)
 
-Licensed under [MIT License](./LICENSE.txt)
+Code Licensed under [MIT License](./LICENSE.txt)
+Models Licensed under [Apache License 2.0](./models/license)
