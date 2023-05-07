@@ -7,7 +7,7 @@ BackgroundRemover is a command line tool to remove background from [image](https
 ### Requirements
 
 * python >= 3.6
-* python3.6-dev #or what ever version of python you using
+* python3.6-dev #or what ever version of python you use
 * torch and torchvision stable version (https://pytorch.org)
 * ffmpeg 4.4+
 
@@ -92,7 +92,7 @@ backgroundremover -i "/path/to/video.mp4" -tg -o "output.gif"
 ```
 ### Make matte key file (green screen overlay)
 
-Make a matte file for premier
+Make a matte file for premiere
 
 ```bash
 backgroundremover -i "/path/to/video.mp4" -mk -o "output.matte.mp4"
@@ -135,7 +135,7 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg" -fl 150 -tv -o "o
 - add ability to adjust and give feedback images or videos to datasets
 - add ability to realtime background removal for videos, for streaming
 - finish flask server api
-- add ability to use other models than u2net, ie your own.
+- add ability to use other models than u2net, ie your own
 - other
 
 ### Pull requests
