@@ -39,10 +39,8 @@ pip install --upgrade pip
 pip install backgroundremover
 ```
 Please note that when you first run the program, it will check to see if you have the u2net models, if you do not, it will pull them from this repo
-# Usage as a cli
 
-To run code without installation and just clone the git:
-
+It is also possible to run this without installing it via pip, just clone the git to local start a virtual env and install requirements and run
 ```bash
 python -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
 ```
@@ -50,7 +48,7 @@ and for windows
 ```bash
 python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
 ```
-
+### Usage as a cli
 ## Image
 
 Remove the background from a local file image
