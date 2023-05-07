@@ -32,18 +32,6 @@ sudo apt install ffmpeg python3.6-dev
 ```
 
 ### Installation
-
-To run code without installation:
-
-```bash
-python -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
-```
-and for windows
-```bash
-python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
-```
-### Installation
-
 To Install backgroundremover, install it from pypi
 
 ```bash
@@ -52,6 +40,17 @@ pip install backgroundremover
 ```
 Please note that when you first run the program, it will check to see if you have the u2net models, if you do not, it will pull them from this repo
 # Usage as a cli
+
+To run code without installation and just clone the git:
+
+```bash
+python -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
+```
+and for windows
+```bash
+python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
+```
+
 ## Image
 
 Remove the background from a local file image
