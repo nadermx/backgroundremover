@@ -64,7 +64,7 @@ Sometimes it is possible to achieve better results by turning on alpha matting. 
 ```bash
 backgroundremover -i "/path/to/image.jpeg" -a -ae 15 -o "output.png"
 ```
-change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
+change the model for different background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
 ```bash
 backgroundremover -i "/path/to/image.jpeg" -m "u2net_human_seg" -o "output.png"
 ```
@@ -123,7 +123,7 @@ Change the number of workers working on video (default is set to 1)
 ```bash
 backgroundremover -i "/path/to/video.mp4" -wn 4 -tv -o "output.mov"
 ```
-change the model for diferent background removal methods between `u2netp`, `u2net`, or `u2net_human_seg` and limit the frames to 150
+change the model for different background removal methods between `u2netp`, `u2net`, or `u2net_human_seg` and limit the frames to 150
 ```bash
 backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg" -fl 150 -tv -o "output.mov"
 ```

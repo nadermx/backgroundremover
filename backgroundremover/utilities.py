@@ -106,7 +106,7 @@ def matte_key(output, file_path,
                                 args=(file_path, frames_dict, gpu_batchsize * prefetched_batches, total_frames))
     p.start()
 
-    # note I am deliberatley not using pool
+    # note I am deliberately not using pool
     # we can't trust it to run all the threads concurrently (or at all)
     workers = [multiprocessing.Process(target=worker,
                                        args=(worker_nodes, wn, results_dict, model_name, gpu_batchsize, total_frames,
