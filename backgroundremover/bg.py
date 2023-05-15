@@ -15,8 +15,11 @@ from hsh.library.hash import Hasher
 from .u2net import detect, u2net
 from . import utilities
 
-DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+# closes https://github.com/nadermx/backgroundremover/issues/18
+try:
+    DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+except:
+    DEVICE = torch.device('mps')
 
 class Net(torch.nn.Module):
     def __init__(self, model_name):
