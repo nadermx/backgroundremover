@@ -12,7 +12,7 @@ with open("requirements.txt") as f:
 setup(
     name="backgroundremover",
     version="0.2.2",
-    description="Background remover from image and video",
+    description="Background remover from image and video using AI",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/nadermx/backgroundremover",
