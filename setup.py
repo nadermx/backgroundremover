@@ -11,7 +11,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="backgroundremover",
-    version="0.2.1",
+    version="0.2.2",
     description="Background remover from image and video",
     long_description=long_description,
     long_description_content_type="text/markdown",
