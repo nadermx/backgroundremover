@@ -128,7 +128,7 @@ def alpha_matting_cutout(
     # erode foreground/background
     structure = None
     if erode_structure_size > 0:
-        structure = np.ones((erode_structure_size, erode_structure_size), dtype=np.int)
+        structure = np.ones((erode_structure_size, erode_structure_size), dtype=np.int64)
 
     is_foreground = binary_erosion(is_foreground, structure=structure)
     is_background = binary_erosion(is_background, structure=structure, border_value=1)
