@@ -318,8 +318,8 @@ def transparentvideooverimage(output, overlay, file_path,
     return
 
 def download_files_from_github(path, model_name):
-    if model_name not in ["u2net", "u2net_human_seg"]:
-        print("Invalid model name, please use 'u2net' or 'u2net_human_seg'")
+    if model_name not in ["u2net", "u2net_human_seg", "u2netp"]:
+        print("Invalid model name, please use 'u2net' or 'u2net_human_seg' or 'u2netp'")
         return
     print(f"downloading model [{model_name}] to {path} ...")
     urls = []
@@ -333,7 +333,8 @@ def download_files_from_github(path, model_name):
                 'https://github.com/nadermx/backgroundremover/raw/main/models/u2hab',
                 'https://github.com/nadermx/backgroundremover/raw/main/models/u2hac',
                 'https://github.com/nadermx/backgroundremover/raw/main/models/u2had']
-
+    elif model_name == 'u2netp':
+        urls = ['https://github.com/nadermx/backgroundremover/raw/main/models/u2netp.pth']
     try:
         os.makedirs(os.path.expanduser("~/.u2net"), exist_ok=True)
     except Exception as e:
