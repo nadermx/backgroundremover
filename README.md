@@ -145,10 +145,6 @@ Accepted
 ### If you like this library
 
 Give a link to our project [BackgroundRemoverAI.com](https://backgroundremoverai.com) or this git, telling people that you like it or use it.
-#### bitcoin
-<a href="bitcoin:BC1Q80PSHGQGQR7WN3KAX59XWVMGQ9FTVWLA7DEW7W?label=backgroundremover&message=BackgroundRemover">bc1q80pshgqgqr7wn3kax59xwvmgq9ftvwla7dew7w</a>
-
-
 
 ### Reason for project
 
