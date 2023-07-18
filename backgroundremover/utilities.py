@@ -241,12 +241,7 @@ def transparentvideo(output, file_path,
     print("Starting alphamerge")
     cmd = "ffmpeg -y -nostats -loglevel 0 -i '%s' -i '%s' -filter_complex '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1' -c:v qtrle -shortest '%s'" % (
         file_path, temp_file, output)
-    process = sp.Popen(cmd, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
-    stdout, stderr = process.communicate()
-    print('after call')
-
-    if stderr:
-        return "ERROR: %s" % stderr.decode("utf-8")
+    sp.run(shlex.split(cmd))
     print("Process finished")
     try:
         temp_dir.cleanup()
