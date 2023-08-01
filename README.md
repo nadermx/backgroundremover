@@ -48,6 +48,13 @@ and for windows
 ```bash
 python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
 ```
+### Installation using Docker
+```bash
+git clone https://github.com/nadermx/backgroundremover.git
+cd backgroundremover
+docker build -t bgremover .
+alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" bgremover:latest'
+```
 ### Usage as a cli
 ## Image
 
