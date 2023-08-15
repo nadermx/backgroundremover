@@ -48,6 +48,13 @@ and for windows
 ```bash
 python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
 ```
+### Installation using Docker
+```bash
+git clone https://github.com/nadermx/backgroundremover.git
+cd backgroundremover
+docker build -t bgremover .
+alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" bgremover:latest'
+```
 ### Usage as a cli
 ## Image
 
@@ -145,10 +152,6 @@ Accepted
 ### If you like this library
 
 Give a link to our project [BackgroundRemoverAI.com](https://backgroundremoverai.com) or this git, telling people that you like it or use it.
-#### bitcoin
-<a href="bitcoin:BC1Q80PSHGQGQR7WN3KAX59XWVMGQ9FTVWLA7DEW7W?label=backgroundremover&message=BackgroundRemover">bc1q80pshgqgqr7wn3kax59xwvmgq9ftvwla7dew7w</a>
-
-
 
 ### Reason for project
 
