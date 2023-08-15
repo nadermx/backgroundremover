@@ -298,7 +298,7 @@ def transparentvideooverimage(output, overlay, file_path,
               framerate)
     print("Scale image")
     temp_image = os.path.abspath("%s/new.jpg" % tmpdirname)
-    cmd = "ffmpeg -i '%s' -i '%s' -filter_complex 'scale2ref[img][vid];[img]setsar=1;[vid]nullsink' -q:v 2 '%s'" % (
+    cmd = "ffmpeg -y -i '%s' -i '%s' -filter_complex 'scale2ref[img][vid];[img]setsar=1;[vid]nullsink' -q:v 2 '%s'" % (
         overlay, file_path, temp_image)
     sp.run(shlex.split(cmd))
     print("Starting alphamerge")
