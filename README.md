@@ -11,6 +11,8 @@ BackgroundRemover is a command line tool to remove background from [image](https
 * torch and torchvision stable version (https://pytorch.org)
 * ffmpeg 4.4+
 
+* To clarify, you must install both python and whatever dev version of python you installed. IE; python3.10-dev with python3.10 or python3.8-dev with python3.8
+
 #### How to install torch and fmpeg
 
 Go to https://pytorch.org and scroll down to `INSTALL PYTORCH` section and follow the instructions.
