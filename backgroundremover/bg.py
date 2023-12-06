@@ -25,7 +25,7 @@ try:
     else:
         DEVICE = torch.device('cpu')
 except Exception as e:
-    print(f"An error occurred: {e}")
+    print(f"Using CPU.  Setting Cuda or MPS failed: {e}")
     DEVICE = torch.device('cpu')
 
 class Net(torch.nn.Module):
