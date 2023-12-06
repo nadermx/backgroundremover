@@ -16,11 +16,16 @@ from .u2net import detect, u2net
 from . import utilities
 
 # closes https://github.com/nadermx/backgroundremover/issues/18
-if torch.cuda.is_available():
-    DEVICE = torch.device('cuda:0')
-elif torch.backends.mps.is_available():
-    DEVICE = torch.device('mps')
-else:
+# closes https://github.com/nadermx/backgroundremover/issues/112
+try:
+    if torch.cuda.is_available():
+        DEVICE = torch.device('cuda:0')
+    elif torch.backends.mps.is_available():
+        DEVICE = torch.device('mps')
+    else:
+        DEVICE = torch.device('cpu')
+except Exception as e:
+    print(f"An error occurred: {e}")
     DEVICE = torch.device('cpu')
 
 class Net(torch.nn.Module):
