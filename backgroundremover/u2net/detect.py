@@ -8,7 +8,8 @@ from PIL import Image
 from torchvision import transforms
 
 from . import data_loader, u2net
-from .. import utilities
+from .. import github
+
 
 def load_model(model_name: str = "u2net"):
     hasher = Hasher()
@@ -38,7 +39,7 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             #or hasher.md5(path) != "e4f636406ca4e2af789941e7f139ee2e"
         ):
-            utilities.download_files_from_github(
+            github.download_files_from_github(
                 path, model_name
             )
 
@@ -48,11 +49,14 @@ def load_model(model_name: str = "u2net"):
             "U2NET_PATH",
             os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
         )
+
+        print(f"DEBUG: path to be checked: {path}")
+
         if (
             not os.path.exists(path)
             #or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
         ):
-            utilities.download_files_from_github(
+            github.download_files_from_github(
                 path, model_name
             )
 
@@ -66,7 +70,7 @@ def load_model(model_name: str = "u2net"):
             not os.path.exists(path)
             #or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
         ):
-            utilities.download_files_from_github(
+            github.download_files_from_github(
                 path, model_name
             )
 

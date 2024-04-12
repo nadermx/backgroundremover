@@ -13,7 +13,7 @@ import torch.nn.functional
 import torch.nn.functional
 from hsh.library.hash import Hasher
 from .u2net import detect, u2net
-from . import utilities
+from . import github
 
 # closes https://github.com/nadermx/backgroundremover/issues/18
 # closes https://github.com/nadermx/backgroundremover/issues/112
@@ -56,7 +56,7 @@ class Net(torch.nn.Module):
             if (
                 not os.path.exists(path)
             ):
-                utilities.download_files_from_github(
+                github.download_files_from_github(
                     path, model_name
                 )
 
@@ -70,7 +70,7 @@ class Net(torch.nn.Module):
                 not os.path.exists(path)
                 #or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
             ):
-                utilities.download_files_from_github(
+                github.download_files_from_github(
                     path, model_name
                 )
 
@@ -84,7 +84,7 @@ class Net(torch.nn.Module):
                 not os.path.exists(path)
                 #or hasher.md5(path) != "347c3d51b01528e5c6c071e3cff1cb55"
             ):
-                utilities.download_files_from_github(
+                github.download_files_from_github(
                     path, model_name
                 )
         else:
