@@ -151,5 +151,6 @@ def predict(net, item):
         img = Image.fromarray(predict_np * 255).convert("RGB")
 
         del d1, d2, d3, d4, d5, d6, d7, pred, predict, predict_np, inputs_test, sample
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
         return img
