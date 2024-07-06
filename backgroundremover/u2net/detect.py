@@ -3,12 +3,22 @@ import os
 import sys
 import numpy as np
 import torch
+import logging
 from hsh.library.hash import Hasher
 from PIL import Image
 from torchvision import transforms
 
 from . import data_loader, u2net
 from .. import github
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+    logger.addHandler(handler)
 
 
 def load_model(model_name: str = "u2net"):
@@ -50,7 +60,7 @@ def load_model(model_name: str = "u2net"):
             os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
         )
 
-        print(f"DEBUG: path to be checked: {path}")
+        logger.debug(f"path to be checked: {path}")
 
         if (
             not os.path.exists(path)
