@@ -89,7 +89,8 @@ def matte_key(output, file_path,
         file_path
     ]
     framerate_output = sp.check_output(cmd, universal_newlines=True)
-    total_frames = int(framerate_output)
+    framerate_output_clean = framerate_output.strip().strip(',')
+    total_frames = int(framerate_output_clean)
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
