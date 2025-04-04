@@ -183,7 +183,102 @@ def main():
         help="Path to the output",
     )
 
+    ap.add_argument(
+        "-if",
+        "--input-folder",
+        type=str,
+        help="Path to a folder containing input videos or images.",
+    )
+
+    ap.add_argument(
+        "-of",
+        "--output-folder",
+        type=str,
+        help="Path to the output folder for processed files.",
+    )
+
     args = ap.parse_args()
+
+    def is_video_file(filename):
+        return filename.lower().endswith((".mp4", ".mov", ".webm", ".ogg", ".gif"))
+
+    def is_image_file(filename):
+        return filename.lower().endswith((".jpg", ".jpeg", ".png"))
+
+    if args.input_folder:
+        input_folder = os.path.abspath(args.input_folder)
+        output_folder = os.path.abspath(args.output_folder or input_folder)
+        os.makedirs(output_folder, exist_ok=True)
+
+        files = [f for f in os.listdir(input_folder) if is_video_file(f) or is_image_file(f)]
+
+        for f in files:
+            input_path = os.path.join(input_folder, f)
+            output_path = os.path.join(output_folder, f"output_{f}")
+
+            if is_video_file(f):
+                if args.mattekey:
+                    utilities.matte_key(output_path, input_path,
+                                        worker_nodes=args.workernodes,
+                                        gpu_batchsize=args.gpubatchsize,
+                                        model_name=args.model,
+                                        frame_limit=args.framelimit,
+                                        framerate=args.framerate)
+                elif args.transparentvideo:
+                    utilities.transparentvideo(output_path, input_path,
+                                               worker_nodes=args.workernodes,
+                                               gpu_batchsize=args.gpubatchsize,
+                                               model_name=args.model,
+                                               frame_limit=args.framelimit,
+                                               framerate=args.framerate)
+                elif args.transparentvideoovervideo:
+                    utilities.transparentvideoovervideo(output_path, os.path.abspath(args.backgroundvideo.name),
+                                                        input_path,
+                                                        worker_nodes=args.workernodes,
+                                                        gpu_batchsize=args.gpubatchsize,
+                                                        model_name=args.model,
+                                                        frame_limit=args.framelimit,
+                                                        framerate=args.framerate)
+                elif args.transparentvideooverimage:
+                    utilities.transparentvideooverimage(output_path, os.path.abspath(args.backgroundimage.name),
+                                                        input_path,
+                                                        worker_nodes=args.workernodes,
+                                                        gpu_batchsize=args.gpubatchsize,
+                                                        model_name=args.model,
+                                                        frame_limit=args.framelimit,
+                                                        framerate=args.framerate)
+                elif args.transparentgif:
+                    utilities.transparentgif(output_path, input_path,
+                                             worker_nodes=args.workernodes,
+                                             gpu_batchsize=args.gpubatchsize,
+                                             model_name=args.model,
+                                             frame_limit=args.framelimit,
+                                             framerate=args.framerate)
+                elif args.transparentgifwithbackground:
+                    utilities.transparentgifwithbackground(output_path, os.path.abspath(args.backgroundimage.name), input_path,
+                                                           worker_nodes=args.workernodes,
+                                                           gpu_batchsize=args.gpubatchsize,
+                                                           model_name=args.model,
+                                                           frame_limit=args.framelimit,
+                                                           framerate=args.framerate)
+            elif is_image_file(f):
+                with open(input_path, "rb") as i, open(output_path, "wb") as o:
+                    r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
+                    w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
+                    w(
+                        o,
+                        remove(
+                            r(i),
+                            model_name=args.model,
+                            alpha_matting=args.alpha_matting,
+                            alpha_matting_foreground_threshold=args.alpha_matting_foreground_threshold,
+                            alpha_matting_background_threshold=args.alpha_matting_background_threshold,
+                            alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
+                            alpha_matting_base_size=args.alpha_matting_base_size,
+                        ),
+                    )
+        return
+
     if args.input.name.rsplit('.', 1)[1] in ['mp4', 'mov', 'webm', 'ogg', 'gif']:
         if args.mattekey:
             utilities.matte_key(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
@@ -249,5 +344,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # torch.multiprocessing.set_start_method('spawn')
     main()
