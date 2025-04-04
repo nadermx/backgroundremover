@@ -89,15 +89,22 @@ def matte_key(output, file_path,
         file_path
     ]
     framerate_output = sp.check_output(cmd, universal_newlines=True)
+
     total_frames = int(framerate_output.replace(',', '').strip())
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
-    fr = info["streams"][0]["r_frame_rate"]
+    video_stream = next((s for s in info["streams"] if s["codec_type"] == "video"), None)
+    if not video_stream:
+        raise Exception("Could not find video stream")
+
+    frame_rate_str = video_stream.get("r_frame_rate", "0/0")
+    if frame_rate_str == "0/0":
+        raise Exception("Could not detect framerate of video")
 
     if framerate == -1:
-        print(F"FRAME RATE DETECTED: {fr} (if this looks wrong, override the frame rate)")
-        framerate = math.ceil(eval(fr))
+        print(F"FRAME RATE DETECTED: {frame_rate_str} (if this looks wrong, override the frame rate)")
+        framerate = math.ceil(eval(frame_rate_str))
 
     print(F"FRAME RATE: {framerate} TOTAL FRAMES: {total_frames}")
 
