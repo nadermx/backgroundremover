@@ -65,7 +65,7 @@ Remove the background from a local file image
 ```bash
 backgroundremover -i "/path/to/image.jpeg" -o "output.png"
 ```
-### Process all images or videos in a folder
+### Process all images in a folder
 
 You can now remove backgrounds from all supported image or video files in a folder using the `--input-folder` (`-if`) option. You can also optionally set an output folder using `--output-folder` (`-of`). If `--output-folder` is not provided, the outputs will be saved in the same input folder, prefixed with `output_`.
 
@@ -97,6 +97,9 @@ backgroundremover -i "/path/to/image.jpeg" -m "u2net_human_seg" -o "output.png"
 ```bash
 backgroundremover -i "/path/to/video.mp4" -tv -o "output.mov"
 ```
+### Process all videos in a folder
+
+You can now remove backgrounds from all supported image or video files in a folder using the `--input-folder` (`-if`) option. You can also optionally set an output folder using `--output-folder` (`-of`). If `--output-folder` is not provided, the outputs will be saved in the same input folder, prefixed with `output_`.
 
 ### Example: Folder of Videos to Transparent `.mov`
 
