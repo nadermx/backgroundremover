@@ -6,7 +6,7 @@ from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 from pymatting.util.util import stack_images
 from scipy.ndimage.morphology import binary_erosion
-import moviepy as mpy
+from moviepy import VideoFileClip
 import numpy as np
 import torch
 import torch.nn.functional
@@ -216,7 +216,7 @@ def remove(
 
 
 def iter_frames(path):
-    return mpy.VideoFileClip(path).resized(height=320).iter_frames(dtype="uint8")
+    return VideoFileClip(path).resized(height=320).iter_frames(dtype="uint8")
 
 
 @torch.no_grad()
