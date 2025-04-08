@@ -6,7 +6,7 @@ from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 from pymatting.util.util import stack_images
 from scipy.ndimage.morphology import binary_erosion
-import moviepy.editor as mpy
+import moviepy as mpy
 import numpy as np
 import torch
 import torch.nn.functional
@@ -186,7 +186,15 @@ def remove(
     alpha_matting_base_size=1000,
 ):
     model = get_model(model_name)
-    img = Image.open(io.BytesIO(data)).convert("RGB")
+
+    if isinstance(data, np.ndarray):
+        img = Image.fromarray(data).convert("RGB")
+    else:
+        try:
+            img = Image.open(io.BytesIO(data)).convert("RGB")
+        except Exception as e:
+            raise ValueError(f"Invalid image input to `remove()`: {e}")
+
     mask = detect.predict(model, np.array(img)).convert("L")
 
     if alpha_matting:
@@ -208,7 +216,7 @@ def remove(
 
 
 def iter_frames(path):
-    return mpy.VideoFileClip(path).resize(height=320).iter_frames(dtype="uint8")
+    return mpy.VideoFileClip(path).resized(height=320).iter_frames(dtype="uint8")
 
 
 @torch.no_grad()

@@ -279,7 +279,9 @@ def main():
                     )
         return
 
-    if args.input.name.rsplit('.', 1)[1] in ['mp4', 'mov', 'webm', 'ogg', 'gif']:
+    ext = os.path.splitext(args.input.name)[1].lower()
+
+    if ext in [".mp4", ".mov", ".webm", ".ogg", ".gif"]:
         if args.mattekey:
             utilities.matte_key(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
                                 worker_nodes=args.workernodes,
@@ -325,8 +327,7 @@ def main():
                                                    frame_limit=args.framelimit,
                                                    framerate=args.framerate)
 
-    else:
-        print(args.output.name)
+    elif ext in [".jpg", ".jpeg", ".png"]:
         r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
         w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
         w(
@@ -341,6 +342,9 @@ def main():
                 alpha_matting_base_size=args.alpha_matting_base_size,
             ),
         )
+    else:
+        print(f"❌ Unsupported file type: {ext}")
+        exit(1)
 
 
 if __name__ == "__main__":

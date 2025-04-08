@@ -6,7 +6,7 @@ BackgroundRemover is a command line tool to remove background from [image](https
 
 ### Requirements
 
-* python >= 3.6 =< 3.11 #does not work for 3.12 yet
+* python >= 3.6
 * python3.6-dev #or what ever version of python you use
 * torch and torchvision stable version (https://pytorch.org)
 * ffmpeg 4.4+
