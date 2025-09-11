@@ -192,7 +192,7 @@ def transparentgif(output, file_path,
               framerate)
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
         '-shortest', output
     ]
 
@@ -223,7 +223,7 @@ def transparentgifwithbackground(output, overlay, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-i', overlay, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
         '-shortest', output
     ]
     sp.run(cmd)
@@ -255,7 +255,7 @@ def transparentvideo(output, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1', '-c:v', 'qtrle', '-shortest', output
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge', '-c:v', 'qtrle', '-shortest', output
     ]
 
     sp.run(cmd)
@@ -287,7 +287,7 @@ def transparentvideoovervideo(output, overlay, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-i', overlay, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay=shortest=1[out]', '-map', '[out]', '-shortest', output
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay=shortest=1[out]', '-map', '[out]', '-shortest', output
     ]
     sp.run(cmd)
     print("Process finished")
