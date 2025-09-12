@@ -107,7 +107,7 @@ def matte_key(output, file_path,
         framerate = math.ceil(eval(frame_rate_str))
 
     print(F"FRAME RATE: {framerate} TOTAL FRAMES: {total_frames}")
-
+    framerate = framerate - 1 # ffmpeg quirk, always one less frame than expected
     p = multiprocessing.Process(target=capture_frames,
                                 args=(file_path, frames_dict, gpu_batchsize * prefetched_batches, total_frames))
     p.start()
