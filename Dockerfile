@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:23.5.2-0 as builder
+FROM continuumio/miniconda3:23.5.2-0 AS builder
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
