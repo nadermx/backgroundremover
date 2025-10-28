@@ -1,7 +1,7 @@
 import io
 import os
 import typing
-from PIL import Image
+from PIL import Image, ImageOps
 from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 from pymatting.util.util import stack_images
@@ -223,7 +223,10 @@ def remove(
         img = Image.fromarray(data).convert("RGB")
     else:
         try:
-            img = Image.open(io.BytesIO(data)).convert("RGB")
+            img = Image.open(io.BytesIO(data))
+            # Handle EXIF orientation to prevent rotated images (fixes #144)
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
         except Exception as e:
             raise ValueError(f"Invalid image input to `remove()`: {e}")
 
@@ -253,7 +256,10 @@ def remove(
             bg = Image.fromarray(background_image).convert("RGB")
         else:
             try:
-                bg = Image.open(io.BytesIO(background_image)).convert("RGB")
+                bg = Image.open(io.BytesIO(background_image))
+                # Handle EXIF orientation for background image too
+                bg = ImageOps.exif_transpose(bg)
+                bg = bg.convert("RGB")
             except Exception as e:
                 raise ValueError(f"Invalid background image input: {e}")
 
