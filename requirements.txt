@@ -21,3 +21,4 @@ moviepy
 Pillow
 pillow-heif
 ffmpeg-python
+flask

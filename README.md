@@ -123,6 +123,60 @@ backgroundremover -i "/path/to/image.jpeg" -bc "0,0,255" -o "output.png"
 # Replace background with another image
 backgroundremover -i "/path/to/image.jpeg" -bi "/path/to/background.jpg" -o "output.png"
 ```
+
+### Use with pipes (stdin/stdout)
+
+You can use backgroundremover in Unix pipelines by reading from stdin and writing to stdout:
+
+```bash
+# Read from stdin, write to stdout
+cat input.jpg | backgroundremover > output.png
+
+# Use with other tools in a pipeline
+curl https://example.com/image.jpg | backgroundremover | convert - -resize 50% smaller.png
+
+# Equivalent explicit syntax
+backgroundremover -i - -o - < input.jpg > output.png
+```
+
+Note: Pipe mode assumes image input (not video).
+
+### Run as HTTP API Server
+
+You can run backgroundremover as an HTTP API server:
+
+```bash
+# Start server on default port 5000
+backgroundremover-server
+
+# Specify custom host and port
+backgroundremover-server --addr 0.0.0.0 --port 8080
+```
+
+API Usage:
+
+```bash
+# Upload image via POST
+curl -X POST -F "file=@image.jpg" http://localhost:5000/ -o output.png
+
+# Process from URL via GET
+curl "http://localhost:5000/?url=https://example.com/image.jpg" -o output.png
+
+# With alpha matting
+curl "http://localhost:5000/?url=https://example.com/image.jpg&a=true&af=240" -o output.png
+
+# Choose model
+curl "http://localhost:5000/?url=https://example.com/image.jpg&model=u2net_human_seg" -o output.png
+```
+
+Parameters:
+- `a` - Enable alpha matting
+- `af` - Alpha matting foreground threshold (default: 240)
+- `ab` - Alpha matting background threshold (default: 10)
+- `ae` - Alpha matting erosion size (default: 10)
+- `az` - Alpha matting base size (default: 1000)
+- `model` - Model choice: `u2net`, `u2netp`, or `u2net_human_seg`
+
 ## Video
 
 ### remove background from video and make transparent mov
@@ -285,7 +339,6 @@ with open("output.png", "wb") as f:
 - clean up documentation a bit more
 - add ability to adjust and give feedback images or videos to datasets
 - add ability to realtime background removal for videos, for streaming
-- finish flask server api
 - add ability to use other models than u2net, ie your own
 - other
 

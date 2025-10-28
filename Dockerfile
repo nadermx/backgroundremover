@@ -8,7 +8,10 @@ RUN apt-get update && \
       git
 
 RUN conda install 'ffmpeg>=4.4.0' -c conda-forge
-RUN conda install pytorch torchvision torchaudio cpuonly -c pytorch
+# Install PyTorch - torchaudio is not required for backgroundremover
+# On ARM64 (Apple Silicon), torchaudio may not be available, so we skip it
+RUN conda install pytorch torchvision cpuonly -c pytorch || \
+    conda install pytorch torchvision -c pytorch
 
 WORKDIR /usr/local/src
 COPY . .

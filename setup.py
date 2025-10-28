@@ -29,6 +29,7 @@ setup(
     entry_points={
         "console_scripts": [
             "backgroundremover=backgroundremover.cmd.cli:main",
+            "backgroundremover-server=backgroundremover.cmd.server:main",
         ],
     },
 )

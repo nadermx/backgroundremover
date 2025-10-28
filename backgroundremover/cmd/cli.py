@@ -319,6 +319,29 @@ def main():
                     )
         return
 
+    # Handle stdin/stdout pipe support
+    # When using pipes, we assume image input unless file extension is detected
+    if args.input.name == "<stdin>" or args.output.name == "<stdout>":
+        # Pipe mode - assume image processing
+        r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
+        w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
+        w(
+            args.output,
+            remove(
+                r(args.input),
+                model_name=args.model,
+                alpha_matting=args.alpha_matting,
+                alpha_matting_foreground_threshold=args.alpha_matting_foreground_threshold,
+                alpha_matting_background_threshold=args.alpha_matting_background_threshold,
+                alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
+                alpha_matting_base_size=args.alpha_matting_base_size,
+                only_mask=args.only_mask,
+                background_color=background_color,
+                background_image=background_image,
+            ),
+        )
+        return
+
     ext = os.path.splitext(args.input.name)[1].lower()
 
     if ext in [".mp4", ".mov", ".webm", ".ogg", ".gif"]:
