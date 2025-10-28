@@ -90,10 +90,32 @@ class Net(torch.nn.Module):
         else:
             print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
 
-        net.load_state_dict(torch.load(path, map_location=torch.device(DEVICE)))
-        net.to(device=DEVICE, dtype=torch.float32, non_blocking=True)
-        net.eval()
-        self.net = net
+        try:
+            net.load_state_dict(torch.load(path, map_location=torch.device(DEVICE)))
+            net.to(device=DEVICE, dtype=torch.float32, non_blocking=True)
+            net.eval()
+            self.net = net
+        except EOFError:
+            print(f"\n{'='*60}")
+            print(f"ERROR: Model file appears to be corrupted or incomplete!")
+            print(f"Path: {path}")
+            print(f"\nThis usually happens when the model download was interrupted.")
+            print(f"To fix this:")
+            print(f"  1. Delete the corrupted file: rm {path}")
+            print(f"  2. Run backgroundremover again to re-download the model")
+            print(f"{'='*60}\n")
+            raise RuntimeError(f"Corrupted model file at {path}. Please delete it and re-run to download again.")
+        except Exception as e:
+            print(f"\n{'='*60}")
+            print(f"ERROR: Failed to load model '{model_name}'")
+            print(f"Path: {path}")
+            print(f"Error: {e}")
+            print(f"\nIf the error persists:")
+            print(f"  1. Try deleting the model file: rm {path}")
+            print(f"  2. Run backgroundremover again to re-download")
+            print(f"  3. Check if you have enough disk space")
+            print(f"{'='*60}\n")
+            raise
 
     def forward(self, block_input: torch.Tensor):
         image_data = block_input.permute(0, 3, 1, 2)
@@ -186,6 +208,7 @@ def remove(
     alpha_matting_base_size=1000,
     only_mask=False,
     background_color=None,
+    background_image=None,
 ):
     model = get_model(model_name)
 
@@ -217,8 +240,26 @@ def remove(
     else:
         cutout = naive_cutout(img, mask)
 
+    # If background_image is specified, composite over that image
+    if background_image is not None:
+        if isinstance(background_image, np.ndarray):
+            bg = Image.fromarray(background_image).convert("RGB")
+        else:
+            try:
+                bg = Image.open(io.BytesIO(background_image)).convert("RGB")
+            except Exception as e:
+                raise ValueError(f"Invalid background image input: {e}")
+
+        # Resize background to match cutout size
+        bg = bg.resize(cutout.size, Image.LANCZOS)
+
+        if cutout.mode == 'RGBA':
+            bg.paste(cutout, mask=cutout.split()[3])
+            cutout = bg
+        else:
+            cutout = bg
     # If background_color is specified, composite with that color
-    if background_color is not None:
+    elif background_color is not None:
         bg = Image.new("RGB", cutout.size, background_color)
         if cutout.mode == 'RGBA':
             bg.paste(cutout, mask=cutout.split()[3])

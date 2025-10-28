@@ -230,6 +230,12 @@ def main():
             print(f"Invalid background color format. Use format '255,0,0' for red. Error: {e}")
             exit(1)
 
+    # Read background image if provided
+    background_image = None
+    if args.backgroundimage and args.backgroundimage.name != "-":
+        r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
+        background_image = r(args.backgroundimage)
+
     def is_video_file(filename):
         return filename.lower().endswith((".mp4", ".mov", ".webm", ".ogg", ".gif"))
 
@@ -308,6 +314,7 @@ def main():
                             alpha_matting_base_size=args.alpha_matting_base_size,
                             only_mask=args.only_mask,
                             background_color=background_color,
+                            background_image=background_image,
                         ),
                     )
         return
@@ -375,6 +382,7 @@ def main():
                 alpha_matting_base_size=args.alpha_matting_base_size,
                 only_mask=args.only_mask,
                 background_color=background_color,
+                background_image=background_image,
             ),
         )
     else:

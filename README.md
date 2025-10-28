@@ -114,6 +114,13 @@ backgroundremover -i "/path/to/image.jpeg" -bc "0,255,0" -o "output.png"
 # Replace with blue background
 backgroundremover -i "/path/to/image.jpeg" -bc "0,0,255" -o "output.png"
 ```
+
+### Replace background with a custom image
+
+```bash
+# Replace background with another image
+backgroundremover -i "/path/to/image.jpeg" -bi "/path/to/background.jpg" -o "output.png"
+```
 ## Video
 
 ### remove background from video and make transparent mov
@@ -247,6 +254,27 @@ f.close()
 f = open("output.png", "wb")
 f.write(img)
 f.close()
+```
+
+### Replace background with custom image
+
+```python
+from backgroundremover.bg import remove
+
+# Read input image
+with open("input.jpg", "rb") as f:
+    input_data = f.read()
+
+# Read background image
+with open("background.jpg", "rb") as f:
+    bg_data = f.read()
+
+# Remove background and composite over background image
+result = remove(input_data, model_name="u2net", background_image=bg_data)
+
+# Save result
+with open("output.png", "wb") as f:
+    f.write(result)
 ```
 
 ## Todo
