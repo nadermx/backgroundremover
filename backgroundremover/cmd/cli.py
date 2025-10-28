@@ -117,7 +117,7 @@ def main():
         const=True,
         default=False,
         type=lambda x: bool(strtobool(x)),
-        help="Output the Matte key file",
+        help="Output a matte key video (black/white mask for video editing). For transparent video use -tv instead.",
     )
     ap.add_argument(
         "-tv",

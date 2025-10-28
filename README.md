@@ -333,6 +333,60 @@ with open("output.png", "wb") as f:
     f.write(result)
 ```
 
+## Testing
+
+Currently, this project does not have automated test cases. Testing is done manually using sample images and videos.
+
+### Manual Testing
+
+To test backgroundremover functionality:
+
+**Test Image Background Removal:**
+```bash
+# Basic test
+backgroundremover -i "test_image.jpg" -o "output.png"
+
+# Test with alpha matting
+backgroundremover -i "test_image.jpg" -a -ae 15 -o "output.png"
+
+# Test mask generation
+backgroundremover -i "test_image.jpg" -om -o "mask.png"
+
+# Test custom background color
+backgroundremover -i "test_image.jpg" -bc "0,255,0" -o "output.png"
+```
+
+**Test Video Processing:**
+```bash
+# Test transparent video
+backgroundremover -i "test_video.mp4" -tv -o "output.mov"
+
+# Test matte key
+backgroundremover -i "test_video.mp4" -mk -o "matte.mov"
+
+# Test transparent GIF
+backgroundremover -i "test_video.mp4" -tg -o "output.gif"
+```
+
+**Test HTTP Server:**
+```bash
+# Start server
+backgroundremover-server --port 5000
+
+# Test with curl (in another terminal)
+curl -X POST -F "file=@test_image.jpg" http://localhost:5000/ -o output.png
+```
+
+### Contributing Tests
+
+Automated tests using pytest or unittest would be a valuable contribution to this project. Test cases should cover:
+- Image processing with different formats (JPG, PNG, HEIC)
+- Video processing with different codecs
+- CLI argument validation
+- HTTP API endpoints
+- Model loading and inference
+- Error handling
+
 ## Todo
 
 - convert logic from video to image to utilize more GPU on image removal
@@ -340,6 +394,7 @@ with open("output.png", "wb") as f:
 - add ability to adjust and give feedback images or videos to datasets
 - add ability to realtime background removal for videos, for streaming
 - add ability to use other models than u2net, ie your own
+- add automated test suite
 - other
 
 ### Pull requests
