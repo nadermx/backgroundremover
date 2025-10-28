@@ -425,6 +425,26 @@ with open("output.png", "wb") as f:
 
 ## Troubleshooting
 
+### "EOFError: Ran out of input" or Model Loading Errors
+
+If you see errors like `EOFError: Ran out of input` or model loading failures:
+
+**Cause:** The model file download was corrupted or interrupted.
+
+**Solution:**
+```bash
+# Delete the corrupted model file
+rm ~/.u2net/u2net.pth
+# Or for other models:
+rm ~/.u2net/u2netp.pth
+rm ~/.u2net/u2net_human_seg.pth
+
+# Then run backgroundremover again - it will re-download the model
+backgroundremover -i "your-image.jpg" -o "output.png"
+```
+
+**Prevention:** The tool now automatically validates and retries failed downloads, but if you have an old corrupted model from a previous version, you'll need to delete it manually.
+
 ### Background Not Removed or Parts Missing
 
 If the background is not being removed properly, or parts of your subject are disappearing:
@@ -533,13 +553,28 @@ Automated tests using pytest or unittest would be a valuable contribution to thi
 
 ## Todo
 
-- convert logic from video to image to utilize more GPU on image removal
-- clean up documentation a bit more
-- add ability to adjust and give feedback images or videos to datasets
-- add ability to realtime background removal for videos, for streaming
-- add ability to use other models than u2net, ie your own
-- add automated test suite
-- other
+### Completed
+- ✅ HTTP API server (use `backgroundremover-server`)
+- ✅ Comprehensive documentation and troubleshooting
+- ✅ Docker support with model persistence
+- ✅ HEIC/HEIF image format support
+- ✅ Pipe support (stdin/stdout)
+- ✅ Custom background colors and images
+- ✅ Binary mask output
+- ✅ Folder batch processing
+
+### In Progress / Future Features
+- Support for additional models (ISNet, BiRefNet, U2Net cloth segmentation)
+- CoreML support for Apple Silicon acceleration
+- Standalone executable (no Python installation required)
+- Automated test suite
+- Real-time background removal for video streaming
+- Convert logic from video to image to utilize more GPU on image removal
+- Ability to provide feedback on results to improve training datasets
+- Support for custom/user-provided models
+- Google Colab notebook
+
+Contributions welcome! See open issues for details.
 
 ### Pull requests
 
