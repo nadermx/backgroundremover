@@ -15,6 +15,13 @@ from hsh.library.hash import Hasher
 from .u2net import detect, u2net
 from . import github
 
+# Register HEIC format support
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except ImportError:
+    pass  # HEIC support is optional
+
 # closes https://github.com/nadermx/backgroundremover/issues/18
 # closes https://github.com/nadermx/backgroundremover/issues/112
 try:

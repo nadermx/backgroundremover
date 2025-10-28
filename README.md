@@ -70,6 +70,8 @@ Remove the background from a local file image
 ```bash
 backgroundremover -i "/path/to/image.jpeg" -o "output.png"
 ```
+
+Supported image formats: `.jpg`, `.jpeg`, `.png`, `.heic`, `.heif` (HEIC/HEIF support requires pillow-heif)
 ### Process all images in a folder
 
 You can now remove backgrounds from all supported image or video files in a folder using the `--input-folder` (`-if`) option. You can also optionally set an output folder using `--output-folder` (`-of`). If `--output-folder` is not provided, the outputs will be saved in the same input folder, prefixed with `output_`.
@@ -80,7 +82,7 @@ You can now remove backgrounds from all supported image or video files in a fold
 backgroundremover -if "/path/to/image-folder" -of "/path/to/output-folder"
 ```
 
-This will process all `.jpg`, `.jpeg`, and `.png` images in the folder and save the results to the output folder.
+This will process all `.jpg`, `.jpeg`, `.png`, `.heic`, and `.heif` images in the folder and save the results to the output folder.
 
 
 

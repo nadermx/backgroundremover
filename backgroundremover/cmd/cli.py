@@ -240,7 +240,7 @@ def main():
         return filename.lower().endswith((".mp4", ".mov", ".webm", ".ogg", ".gif"))
 
     def is_image_file(filename):
-        return filename.lower().endswith((".jpg", ".jpeg", ".png"))
+        return filename.lower().endswith((".jpg", ".jpeg", ".png", ".heic", ".heif"))
 
     if args.input_folder:
         input_folder = os.path.abspath(args.input_folder)
@@ -367,7 +367,7 @@ def main():
                                                    frame_limit=args.framelimit,
                                                    framerate=args.framerate)
 
-    elif ext in [".jpg", ".jpeg", ".png"]:
+    elif ext in [".jpg", ".jpeg", ".png", ".heic", ".heif"]:
         r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
         w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
         w(
@@ -387,6 +387,8 @@ def main():
         )
     else:
         print(f"❌ Unsupported file type: {ext}")
+        print(f"Supported image formats: .jpg, .jpeg, .png, .heic, .heif")
+        print(f"Supported video formats: .mp4, .mov, .webm, .ogg, .gif")
         exit(1)
 
 

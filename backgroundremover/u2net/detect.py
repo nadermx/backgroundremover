@@ -49,9 +49,6 @@ def load_model(model_name: str = "u2net"):
             "U2NET_PATH",
             os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
         )
-
-        print(f"DEBUG: path to be checked: {path}")
-
         if (
             not os.path.exists(path)
             #or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"

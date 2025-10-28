@@ -19,4 +19,5 @@ hsh
 more_itertools
 moviepy
 Pillow
+pillow-heif
 ffmpeg-python
