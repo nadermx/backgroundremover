@@ -132,20 +132,16 @@ def main():
     ap.add_argument(
         "-tov",
         "--transparentvideoovervideo",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Overlay transparent video over another video",
+        help="Overlay transparent video over another video (use -bv to specify background video)",
     )
     ap.add_argument(
         "-toi",
         "--transparentvideooverimage",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Overlay transparent video over another image",
+        help="Overlay transparent video over another image (use -bi to specify background image)",
     )
     ap.add_argument(
         "-tg",
@@ -159,11 +155,9 @@ def main():
     ap.add_argument(
         "-tgwb",
         "--transparentgifwithbackground",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Make transparent background overlay a background image",
+        help="Make transparent background overlay a background image (use -bv to specify background video)",
     )
 
     ap.add_argument(
