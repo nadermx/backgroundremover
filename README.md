@@ -55,7 +55,12 @@ python.exe -m backgroundremover.cmd.cli -i "video.mp4" -mk -o "output.mov"
 git clone https://github.com/nadermx/backgroundremover.git
 cd backgroundremover
 docker build -t bgremover .
+# Basic usage (models will be downloaded on each run)
 alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" bgremover:latest'
+
+# Recommended: Persist models between runs to avoid re-downloading
+mkdir -p ~/.u2net
+alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" -v "$HOME/.u2net:/root/.u2net" bgremover:latest'
 ```
 ### Usage as a cli
 ## Image
@@ -89,6 +94,25 @@ backgroundremover -i "/path/to/image.jpeg" -a -ae 15 -o "output.png"
 change the model for different background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
 ```bash
 backgroundremover -i "/path/to/image.jpeg" -m "u2net_human_seg" -o "output.png"
+```
+
+### Output only the mask (binary mask/matte)
+
+```bash
+backgroundremover -i "/path/to/image.jpeg" -om -o "mask.png"
+```
+
+### Replace background with a custom color
+
+```bash
+# Replace with red background
+backgroundremover -i "/path/to/image.jpeg" -bc "255,0,0" -o "output.png"
+
+# Replace with green background
+backgroundremover -i "/path/to/image.jpeg" -bc "0,255,0" -o "output.png"
+
+# Replace with blue background
+backgroundremover -i "/path/to/image.jpeg" -bc "0,0,255" -o "output.png"
 ```
 ## Video
 
@@ -175,8 +199,9 @@ backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg" -fl 150 -tv -o "o
 ## As a library
 ### Remove background image
 
-```
+```python
 from backgroundremover.bg import remove
+
 def remove_bg(src_img_path, out_img_path):
     model_choices = ["u2net", "u2net_human_seg", "u2netp"]
     f = open(src_img_path, "rb")
@@ -191,6 +216,37 @@ def remove_bg(src_img_path, out_img_path):
     f = open(out_img_path, "wb")
     f.write(img)
     f.close()
+```
+
+### Generate only a binary mask
+
+```python
+from backgroundremover.bg import remove
+
+f = open("input.jpg", "rb")
+data = f.read()
+mask = remove(data, model_name="u2net", only_mask=True)
+f.close()
+
+f = open("mask.png", "wb")
+f.write(mask)
+f.close()
+```
+
+### Replace background with custom color
+
+```python
+from backgroundremover.bg import remove
+
+f = open("input.jpg", "rb")
+data = f.read()
+# Use RGB tuple for background color (255, 0, 0) = red
+img = remove(data, model_name="u2net", background_color=(255, 0, 0))
+f.close()
+
+f = open("output.png", "wb")
+f.write(img)
+f.close()
 ```
 
 ## Todo

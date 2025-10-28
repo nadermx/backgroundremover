@@ -184,6 +184,8 @@ def remove(
     alpha_matting_background_threshold=10,
     alpha_matting_erode_structure_size=10,
     alpha_matting_base_size=1000,
+    only_mask=False,
+    background_color=None,
 ):
     model = get_model(model_name)
 
@@ -197,6 +199,12 @@ def remove(
 
     mask = detect.predict(model, np.array(img)).convert("L")
 
+    # If only_mask is True, return just the mask
+    if only_mask:
+        bio = io.BytesIO()
+        mask.save(bio, "PNG")
+        return bio.getbuffer()
+
     if alpha_matting:
         cutout = alpha_matting_cutout(
             img,
@@ -208,6 +216,15 @@ def remove(
         )
     else:
         cutout = naive_cutout(img, mask)
+
+    # If background_color is specified, composite with that color
+    if background_color is not None:
+        bg = Image.new("RGB", cutout.size, background_color)
+        if cutout.mode == 'RGBA':
+            bg.paste(cutout, mask=cutout.split()[3])
+            cutout = bg
+        else:
+            cutout = bg
 
     bio = io.BytesIO()
     cutout.save(bio, "PNG")

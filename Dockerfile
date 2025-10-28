@@ -20,5 +20,12 @@ FROM debian:bullseye-slim
 COPY --from=builder /opt/conda /opt/conda
 ENV PATH=/opt/conda/bin:$PATH
 
+# Create directory for model cache
+RUN mkdir -p /root/.u2net
+
+# Define volume for model persistence
+# To use: docker run -v ~/.u2net:/root/.u2net ...
+VOLUME ["/root/.u2net"]
+
 WORKDIR /tmp
 ENTRYPOINT ["python", "-m", "backgroundremover.cmd.cli"]

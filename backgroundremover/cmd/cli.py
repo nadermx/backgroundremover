@@ -60,6 +60,25 @@ def main():
         type=int,
         help="The image base size.",
     )
+
+    ap.add_argument(
+        "-om",
+        "--only-mask",
+        nargs="?",
+        const=True,
+        default=False,
+        type=lambda x: bool(strtobool(x)),
+        help="Output only the binary mask (grayscale image).",
+    )
+
+    ap.add_argument(
+        "-bc",
+        "--background-color",
+        type=str,
+        default=None,
+        help="Background color as RGB tuple, e.g., '255,0,0' for red or '0,255,0' for green.",
+    )
+
     ap.add_argument(
         "-wn",
         "--workernodes",
@@ -199,6 +218,18 @@ def main():
 
     args = ap.parse_args()
 
+    # Parse background color if provided
+    background_color = None
+    if args.background_color:
+        try:
+            rgb_values = tuple(int(x.strip()) for x in args.background_color.split(','))
+            if len(rgb_values) != 3 or not all(0 <= v <= 255 for v in rgb_values):
+                raise ValueError("RGB values must be between 0 and 255")
+            background_color = rgb_values
+        except Exception as e:
+            print(f"Invalid background color format. Use format '255,0,0' for red. Error: {e}")
+            exit(1)
+
     def is_video_file(filename):
         return filename.lower().endswith((".mp4", ".mov", ".webm", ".ogg", ".gif"))
 
@@ -275,6 +306,8 @@ def main():
                             alpha_matting_background_threshold=args.alpha_matting_background_threshold,
                             alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
                             alpha_matting_base_size=args.alpha_matting_base_size,
+                            only_mask=args.only_mask,
+                            background_color=background_color,
                         ),
                     )
         return
@@ -340,6 +373,8 @@ def main():
                 alpha_matting_background_threshold=args.alpha_matting_background_threshold,
                 alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
                 alpha_matting_base_size=args.alpha_matting_base_size,
+                only_mask=args.only_mask,
+                background_color=background_color,
             ),
         )
     else:
