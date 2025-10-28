@@ -17,19 +17,27 @@ BackgroundRemover is a command line tool to remove background from [image](https
 
 Go to https://pytorch.org and scroll down to `INSTALL PYTORCH` section and follow the instructions.
 
-For example:
+**For CPU-only (default):**
 
-```
-PyTorch Build: Stable (1.7.1)
-Your OS: Windows
-Package: Pip
-Language: Python
-CUDA: None
+```bash
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ```
 
-To install ffmpeg and python-dev
+**For GPU (CUDA) support:**
 
+```bash
+# For CUDA 11.8
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# For CUDA 12.1
+pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ```
+
+Visit https://pytorch.org/get-started/locally/ to find the correct command for your CUDA version.
+
+**To install ffmpeg and python-dev:**
+
+```bash
 sudo apt install ffmpeg python3.6-dev
 ```
 
@@ -61,7 +69,32 @@ alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" bgremover:latest'
 # Recommended: Persist models between runs to avoid re-downloading
 mkdir -p ~/.u2net
 alias backgroundremover='docker run -it --rm -v "$(pwd):/tmp" -v "$HOME/.u2net:/root/.u2net" bgremover:latest'
+
+# For video processing: Increase shared memory to avoid multiprocessing errors
+alias backgroundremover='docker run -it --rm --shm-size=2g -v "$(pwd):/tmp" -v "$HOME/.u2net:/root/.u2net" bgremover:latest'
 ```
+
+**Note for Docker video processing:** Video processing uses multiprocessing which requires adequate shared memory. If you encounter errors like `OSError: [Errno 95] Operation not supported`, use `--shm-size=2g` (or higher) or `--ipc=host` when running the container.
+
+### GPU Acceleration
+
+BackgroundRemover automatically detects and uses your GPU if available, which provides significant speed improvements (typically 5-10x faster than CPU).
+
+**To verify GPU is being used:**
+
+```bash
+python3 -c "import torch; print('GPU available:', torch.cuda.is_available()); print('GPU name:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'N/A')"
+```
+
+**Troubleshooting GPU issues:**
+
+1. **GPU not detected**: Ensure you installed the CUDA-compatible version of PyTorch (see installation instructions above)
+2. **Out of memory errors**: Reduce GPU batch size with `-gb 1` flag
+3. **Slow performance on CPU**: Install CUDA-compatible PyTorch for GPU acceleration
+4. **CUDA version mismatch**: Match your PyTorch CUDA version with your system's CUDA installation
+
+The tool will automatically fall back to CPU if GPU is not available or encounters errors.
+
 ### Usage as a cli
 ## Image
 
@@ -228,6 +261,37 @@ Make a matte file for premiere
 ```bash
 backgroundremover -i "/path/to/video.mp4" -mk -o "output.matte.mp4"
 ```
+
+### Video Playback and Compatibility
+
+**Important:** The transparent `.mov` files created by this tool use the `qtrle` (QuickTime RLE) codec with alpha channel. Not all video players support this format correctly.
+
+**Recommended video players:**
+- **mpv** (https://mpv.io) - Best support for transparent videos (Linux, Mac, Windows)
+- **QuickTime Player** (Mac) - Native support on macOS
+- **DaVinci Resolve** / **Adobe Premiere** - Full support in video editors (may need to enable alpha channel in properties)
+
+**Common issues:**
+- **VLC**: May not display transparency correctly - shows distorted colors or green/purple tint
+- **Windows Media Player**: Limited transparency support
+- **Web browsers**: Limited support for qtrle codec
+
+**Workarounds if your player doesn't support transparency:**
+
+1. **Convert to WebM with VP9 (better compatibility):**
+   ```bash
+   ffmpeg -i output.mov -c:v libvpx-vp9 -pix_fmt yuva420p output.webm
+   ```
+
+2. **Add a colored background (for testing):**
+   ```bash
+   ffmpeg -f lavfi -i color=white:s=1920x1080 -i output.mov -filter_complex 'overlay=0:0' -c:v libx264 output_with_bg.mp4
+   ```
+
+3. **Use the transparent GIF output instead** (simpler but lower quality):
+   ```bash
+   backgroundremover -i "video.mp4" -tg -o "output.gif"
+   ```
 
 ### Advance usage for video
 
