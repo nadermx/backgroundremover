@@ -121,14 +121,38 @@ This will process all `.jpg`, `.jpeg`, `.png`, `.heic`, and `.heif` images in th
 
 ### Advance usage for image background removal
 
-Sometimes it is possible to achieve better results by turning on alpha matting. Example:
+**Alpha Matting for Better Edge Quality:**
+
+By default, backgroundremover produces soft, natural edges. For some use cases (like cartoons, graphics, or sharp-edged objects), you may want sharper edges or better edge refinement.
 
 ```bash
-backgroundremover -i "/path/to/image.jpeg" -a -ae 15 -o "output.png"
+# Enable alpha matting for refined edges
+backgroundremover -i "/path/to/image.jpeg" -a -o "output.png"
+
+# Adjust erosion size for sharper/softer edges (default: 10)
+# Smaller values (1-5) = sharper, harder edges (good for cartoons/graphics)
+# Larger values (15-25) = softer, more natural edges (good for portraits)
+backgroundremover -i "/path/to/image.jpeg" -a -ae 5 -o "output.png"
 ```
-change the model for different background removal methods between `u2netp`, `u2net`, or `u2net_human_seg`
+
+**Alpha matting parameters:**
+- `-a` - Enable alpha matting
+- `-af` - Foreground threshold (default: 240)
+- `-ab` - Background threshold (default: 10)
+- `-ae` - Erosion size (1-25, default: 10) - controls edge sharpness
+- `-az` - Base size (default: 1000) - affects processing resolution
+
+**Change the model for different subjects:**
+
 ```bash
+# For humans/people - most accurate for human subjects
 backgroundremover -i "/path/to/image.jpeg" -m "u2net_human_seg" -o "output.png"
+
+# For general objects - good all-around model (default)
+backgroundremover -i "/path/to/image.jpeg" -m "u2net" -o "output.png"
+
+# Faster processing - lower accuracy but quicker
+backgroundremover -i "/path/to/image.jpeg" -m "u2netp" -o "output.png"
 ```
 
 ### Output only the mask (binary mask/matte)
@@ -318,6 +342,8 @@ Change the number of workers working on video (default is set to 1)
 ```bash
 backgroundremover -i "/path/to/video.mp4" -wn 4 -tv -o "output.mov"
 ```
+
+**Note:** Using high worker counts (>4) may cause `ConnectionResetError` or crashes on some systems due to multiprocessing limitations. If you experience errors, reduce the number of workers or use `-wn 1`. The optimal number depends on your CPU cores and available RAM.
 change the model for different background removal methods between `u2netp`, `u2net`, or `u2net_human_seg` and limit the frames to 150
 ```bash
 backgroundremover -i "/path/to/video.mp4" -m "u2net_human_seg" -fl 150 -tv -o "output.mov"
@@ -396,6 +422,60 @@ result = remove(input_data, model_name="u2net", background_image=bg_data)
 with open("output.png", "wb") as f:
     f.write(result)
 ```
+
+## Troubleshooting
+
+### Background Not Removed or Parts Missing
+
+If the background is not being removed properly, or parts of your subject are disappearing:
+
+1. **Try a different model:**
+   - Use `u2net_human_seg` for people/portraits
+   - Use `u2net` (default) for general objects
+   - The model choice significantly affects results
+
+2. **Adjust alpha matting:**
+   - Enable with `-a` flag for better edge detection
+   - Adjust threshold values `-af` and `-ab` if parts are incorrectly classified
+
+3. **Check your input:**
+   - Ensure good lighting and contrast between subject and background
+   - Avoid backgrounds that are similar in color to your subject
+   - Consider manually cropping to include more recognizable background
+
+### Transparency Issues or Strange Colors
+
+If the output video shows distorted colors, green/purple tint, or transparency isn't working:
+
+1. **Check your video player** - See the "Video Playback and Compatibility" section above
+2. **Use a recommended player** like mpv or QuickTime Player
+3. **Convert to a different format** if needed (see WebM conversion examples)
+
+### Large Output File Sizes
+
+The transparent `.mov` files use uncompressed `qtrle` codec and will be significantly larger than the input. This is expected:
+
+- A 10MB input video may produce a 500MB+ output
+- This is normal for lossless transparency
+- Use post-processing to compress if needed (see conversion examples in the playback section)
+
+### Poor Quality or Inaccurate Results
+
+Background removal quality depends on:
+
+1. **Input quality** - Higher resolution and better lighting improve results
+2. **Subject complexity** - Simple, well-defined subjects work best
+3. **Model limitations** - AI models may struggle with:
+   - Very similar colors between subject and background
+   - Complex hair/fur details
+   - Transparent or reflective objects
+   - Unusual subjects the model wasn't trained on
+
+**Tips for better results:**
+- Use `u2net_human_seg` specifically for human subjects
+- Enable alpha matting with `-a` for complex edges
+- Ensure good contrast between subject and background when capturing
+- Try different alpha matting parameters (`-ae`, `-af`, `-ab`)
 
 ## Testing
 
