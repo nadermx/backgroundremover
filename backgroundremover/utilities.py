@@ -153,7 +153,7 @@ def matte_key(output, file_path,
 
                     proc = sp.Popen(command, stdin=sp.PIPE)
 
-                proc.stdin.write(frame.tostring())
+                proc.stdin.write(frame.tobytes())
                 frame_counter = frame_counter + 1
 
                 if frame_counter >= total_frames:
