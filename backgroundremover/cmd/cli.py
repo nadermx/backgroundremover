@@ -173,7 +173,7 @@ def main():
         "-bi",
         "--backgroundimage",
         nargs="?",
-        default="-",
+        default=None,
         type=argparse.FileType("rb"),
         help="Path to background image.",
     )
