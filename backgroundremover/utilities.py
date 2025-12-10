@@ -136,10 +136,29 @@ def matte_key(output, file_path,
 
             hash_index = i * worker_nodes + 1 + wx
 
-            while hash_index not in results_dict:
-                time.sleep(0.1)
+            try:
+                timeout_counter = 0
+                while hash_index not in results_dict:
+                    time.sleep(0.1)
+                    timeout_counter += 1
+                    # Check if workers are still alive every 10 seconds
+                    if timeout_counter % 100 == 0:
+                        dead_workers = [w for w in workers if not w.is_alive()]
+                        if dead_workers and hash_index not in results_dict:
+                            raise RuntimeError(f"Worker process crashed while waiting for frame batch {hash_index}. Try reducing worker count with -wn 1")
 
-            frames = results_dict[hash_index]
+                frames = results_dict[hash_index]
+            except (ConnectionResetError, BrokenPipeError) as e:
+                print(f"\nError: Worker connection lost (frame batch {hash_index}). This often happens with high worker counts.")
+                print("Try reducing workers with -wn 1 or -wn 2")
+                # Clean up
+                p.terminate()
+                for w in workers:
+                    w.terminate()
+                if proc:
+                    proc.stdin.close()
+                    proc.wait()
+                raise RuntimeError(f"Worker connection error: {e}")
             # dont block access to it anymore
             del results_dict[hash_index]
 
@@ -160,7 +179,7 @@ def matte_key(output, file_path,
 
                     proc = sp.Popen(command, stdin=sp.PIPE)
 
-                proc.stdin.write(frame.tostring())
+                proc.stdin.write(frame.tobytes())
                 frame_counter = frame_counter + 1
 
                 if frame_counter >= total_frames:
@@ -230,7 +249,7 @@ def transparentgifwithbackground(output, overlay, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-i', overlay, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge[fg];[2][fg]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:format=auto,fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
         '-shortest', output
     ]
     sp.run(cmd)
@@ -262,7 +281,7 @@ def transparentvideo(output, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1', '-c:v', 'qtrle', '-shortest', output
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge', '-c:v', 'qtrle', '-shortest', output
     ]
 
     sp.run(cmd)
@@ -294,7 +313,7 @@ def transparentvideoovervideo(output, overlay, file_path,
     print("Starting alphamerge")
     cmd = [
         'ffmpeg', '-y', '-i', file_path, '-i', temp_file, '-i', overlay, '-filter_complex',
-        '[1][0]scale2ref[mask][main];[main][mask]alphamerge=shortest=1[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay=shortest=1[out]', '-map', '[out]', '-shortest', output
+        '[1][0]scale2ref[mask][main];[main][mask]alphamerge[vid];[vid][2:v]scale2ref[fg][bg];[bg][fg]overlay[out]', '-map', '[out]', '-shortest', output
     ]
     sp.run(cmd)
     print("Process finished")

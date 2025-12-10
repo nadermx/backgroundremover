@@ -1,7 +1,7 @@
 import io
 import os
 import typing
-from PIL import Image
+from PIL import Image, ImageOps
 from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 from pymatting.util.util import stack_images
@@ -14,6 +14,13 @@ import torch.nn.functional
 from hsh.library.hash import Hasher
 from .u2net import detect, u2net
 from . import github
+
+# Register HEIC format support
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except ImportError:
+    pass  # HEIC support is optional
 
 # closes https://github.com/nadermx/backgroundremover/issues/18
 # closes https://github.com/nadermx/backgroundremover/issues/112
@@ -90,10 +97,32 @@ class Net(torch.nn.Module):
         else:
             print("Choose between u2net, u2net_human_seg or u2netp", file=sys.stderr)
 
-        net.load_state_dict(torch.load(path, map_location=torch.device(DEVICE)))
-        net.to(device=DEVICE, dtype=torch.float32, non_blocking=True)
-        net.eval()
-        self.net = net
+        try:
+            net.load_state_dict(torch.load(path, map_location=torch.device(DEVICE)))
+            net.to(device=DEVICE, dtype=torch.float32, non_blocking=True)
+            net.eval()
+            self.net = net
+        except EOFError:
+            print(f"\n{'='*60}")
+            print(f"ERROR: Model file appears to be corrupted or incomplete!")
+            print(f"Path: {path}")
+            print(f"\nThis usually happens when the model download was interrupted.")
+            print(f"To fix this:")
+            print(f"  1. Delete the corrupted file: rm {path}")
+            print(f"  2. Run backgroundremover again to re-download the model")
+            print(f"{'='*60}\n")
+            raise RuntimeError(f"Corrupted model file at {path}. Please delete it and re-run to download again.")
+        except Exception as e:
+            print(f"\n{'='*60}")
+            print(f"ERROR: Failed to load model '{model_name}'")
+            print(f"Path: {path}")
+            print(f"Error: {e}")
+            print(f"\nIf the error persists:")
+            print(f"  1. Try deleting the model file: rm {path}")
+            print(f"  2. Run backgroundremover again to re-download")
+            print(f"  3. Check if you have enough disk space")
+            print(f"{'='*60}\n")
+            raise
 
     def forward(self, block_input: torch.Tensor):
         image_data = block_input.permute(0, 3, 1, 2)
@@ -184,6 +213,9 @@ def remove(
     alpha_matting_background_threshold=10,
     alpha_matting_erode_structure_size=10,
     alpha_matting_base_size=1000,
+    only_mask=False,
+    background_color=None,
+    background_image=None,
 ):
     model = get_model(model_name)
 
@@ -191,11 +223,20 @@ def remove(
         img = Image.fromarray(data).convert("RGB")
     else:
         try:
-            img = Image.open(io.BytesIO(data)).convert("RGB")
+            img = Image.open(io.BytesIO(data))
+            # Handle EXIF orientation to prevent rotated images (fixes #144)
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
         except Exception as e:
             raise ValueError(f"Invalid image input to `remove()`: {e}")
 
     mask = detect.predict(model, np.array(img)).convert("L")
+
+    # If only_mask is True, return just the mask
+    if only_mask:
+        bio = io.BytesIO()
+        mask.save(bio, "PNG")
+        return bio.getbuffer()
 
     if alpha_matting:
         cutout = alpha_matting_cutout(
@@ -208,6 +249,36 @@ def remove(
         )
     else:
         cutout = naive_cutout(img, mask)
+
+    # If background_image is specified, composite over that image
+    if background_image is not None:
+        if isinstance(background_image, np.ndarray):
+            bg = Image.fromarray(background_image).convert("RGB")
+        else:
+            try:
+                bg = Image.open(io.BytesIO(background_image))
+                # Handle EXIF orientation for background image too
+                bg = ImageOps.exif_transpose(bg)
+                bg = bg.convert("RGB")
+            except Exception as e:
+                raise ValueError(f"Invalid background image input: {e}")
+
+        # Resize background to match cutout size
+        bg = bg.resize(cutout.size, Image.LANCZOS)
+
+        if cutout.mode == 'RGBA':
+            bg.paste(cutout, mask=cutout.split()[3])
+            cutout = bg
+        else:
+            cutout = bg
+    # If background_color is specified, composite with that color
+    elif background_color is not None:
+        bg = Image.new("RGB", cutout.size, background_color)
+        if cutout.mode == 'RGBA':
+            bg.paste(cutout, mask=cutout.split()[3])
+            cutout = bg
+        else:
+            cutout = bg
 
     bio = io.BytesIO()
     cutout.save(bio, "PNG")

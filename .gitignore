@@ -177,3 +177,16 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python
 
 .DS_Store
+
+# Test files and directories
+olddist/
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.gif
+*.GIF
+*.webp
+*.WEBP
+token.txt
+CLAUDE.md

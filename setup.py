@@ -11,7 +11,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="backgroundremover",
-    version="0.3.4",
+    version="0.3.7",
     description="Background remover from image and video using AI",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,6 +29,7 @@ setup(
     entry_points={
         "console_scripts": [
             "backgroundremover=backgroundremover.cmd.cli:main",
+            "backgroundremover-server=backgroundremover.cmd.server:main",
         ],
     },
 )

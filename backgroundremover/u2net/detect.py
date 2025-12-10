@@ -49,9 +49,6 @@ def load_model(model_name: str = "u2net"):
             "U2NET_PATH",
             os.path.expanduser(os.path.join("~", ".u2net", model_name + ".pth")),
         )
-
-        print(f"DEBUG: path to be checked: {path}")
-
         if (
             not os.path.exists(path)
             #or hasher.md5(path) != "09fb4e49b7f785c9f855baf94916840a"
@@ -92,6 +89,27 @@ def load_model(model_name: str = "u2net"):
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), model_name + ".pth"
         )
+    except EOFError:
+        print(f"\n{'='*60}")
+        print(f"ERROR: Model file appears to be corrupted or incomplete!")
+        print(f"Path: {path}")
+        print(f"\nThis usually happens when the model download was interrupted.")
+        print(f"To fix this:")
+        print(f"  1. Delete the corrupted file: rm {path}")
+        print(f"  2. Run backgroundremover again to re-download the model")
+        print(f"{'='*60}\n")
+        raise RuntimeError(f"Corrupted model file at {path}. Please delete it and re-run to download again.")
+    except Exception as e:
+        print(f"\n{'='*60}")
+        print(f"ERROR: Failed to load model '{model_name}'")
+        print(f"Path: {path}")
+        print(f"Error: {e}")
+        print(f"\nIf the error persists:")
+        print(f"  1. Try deleting the model file: rm {path}")
+        print(f"  2. Run backgroundremover again to re-download")
+        print(f"  3. Check if you have enough disk space")
+        print(f"{'='*60}\n")
+        raise
 
     net.eval()
 

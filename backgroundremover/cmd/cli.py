@@ -60,6 +60,25 @@ def main():
         type=int,
         help="The image base size.",
     )
+
+    ap.add_argument(
+        "-om",
+        "--only-mask",
+        nargs="?",
+        const=True,
+        default=False,
+        type=lambda x: bool(strtobool(x)),
+        help="Output only the binary mask (grayscale image).",
+    )
+
+    ap.add_argument(
+        "-bc",
+        "--background-color",
+        type=str,
+        default=None,
+        help="Background color as RGB tuple, e.g., '255,0,0' for red or '0,255,0' for green.",
+    )
+
     ap.add_argument(
         "-wn",
         "--workernodes",
@@ -98,7 +117,7 @@ def main():
         const=True,
         default=False,
         type=lambda x: bool(strtobool(x)),
-        help="Output the Matte key file",
+        help="Output a matte key video (black/white mask for video editing). For transparent video use -tv instead.",
     )
     ap.add_argument(
         "-tv",
@@ -113,20 +132,16 @@ def main():
     ap.add_argument(
         "-tov",
         "--transparentvideoovervideo",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Overlay transparent video over another video",
+        help="Overlay transparent video over another video (use -bv to specify background video)",
     )
     ap.add_argument(
         "-toi",
         "--transparentvideooverimage",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Overlay transparent video over another image",
+        help="Overlay transparent video over another image (use -bi to specify background image)",
     )
     ap.add_argument(
         "-tg",
@@ -140,11 +155,9 @@ def main():
     ap.add_argument(
         "-tgwb",
         "--transparentgifwithbackground",
-        nargs="?",
-        const=True,
+        action="store_true",
         default=False,
-        type=lambda x: bool(strtobool(x)),
-        help="Make transparent background overlay a background image",
+        help="Make transparent background overlay a background image (use -bv to specify background video)",
     )
 
     ap.add_argument(
@@ -160,7 +173,7 @@ def main():
         "-bi",
         "--backgroundimage",
         nargs="?",
-        default="-",
+        default=None,
         type=argparse.FileType("rb"),
         help="Path to background image.",
     )
@@ -199,11 +212,50 @@ def main():
 
     args = ap.parse_args()
 
+    # Validate that -toi and -tov have their required background arguments
+    if args.transparentvideooverimage and (not args.backgroundimage or args.backgroundimage.name == "<stdin>"):
+        print("Error: -toi/--transparentvideooverimage requires -bi/--backgroundimage to specify the background image.")
+        print("Example: backgroundremover -i video.mp4 -toi -bi background.png -o output.mov")
+        exit(1)
+
+    if args.transparentvideoovervideo and (not args.backgroundvideo or args.backgroundvideo.name == "<stdin>"):
+        print("Error: -tov/--transparentvideoovervideo requires -bv/--backgroundvideo to specify the background video.")
+        print("Example: backgroundremover -i video.mp4 -tov -bv background.mp4 -o output.mov")
+        exit(1)
+
+    if args.transparentgifwithbackground and (not args.backgroundimage or args.backgroundimage.name == "<stdin>"):
+        print("Error: -tgwb/--transparentgifwithbackground requires -bi/--backgroundimage to specify the background image.")
+        print("Example: backgroundremover -i video.mp4 -tgwb -bi background.png -o output.gif")
+        exit(1)
+
+    # Warn about high worker counts that may cause issues
+    if args.workernodes > 4:
+        print(f"Warning: Using {args.workernodes} workers. High worker counts (>4) may cause ConnectionResetError or crashes on some systems.")
+        print("If you experience errors, try reducing workers with -wn 1 or -wn 2")
+
+    # Parse background color if provided
+    background_color = None
+    if args.background_color:
+        try:
+            rgb_values = tuple(int(x.strip()) for x in args.background_color.split(','))
+            if len(rgb_values) != 3 or not all(0 <= v <= 255 for v in rgb_values):
+                raise ValueError("RGB values must be between 0 and 255")
+            background_color = rgb_values
+        except Exception as e:
+            print(f"Invalid background color format. Use format '255,0,0' for red. Error: {e}")
+            exit(1)
+
+    # Read background image if provided
+    background_image = None
+    if args.backgroundimage and args.backgroundimage.name != "-":
+        r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
+        background_image = r(args.backgroundimage)
+
     def is_video_file(filename):
         return filename.lower().endswith((".mp4", ".mov", ".webm", ".ogg", ".gif"))
 
     def is_image_file(filename):
-        return filename.lower().endswith((".jpg", ".jpeg", ".png"))
+        return filename.lower().endswith((".jpg", ".jpeg", ".png", ".heic", ".heif"))
 
     if args.input_folder:
         input_folder = os.path.abspath(args.input_folder)
@@ -275,8 +327,34 @@ def main():
                             alpha_matting_background_threshold=args.alpha_matting_background_threshold,
                             alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
                             alpha_matting_base_size=args.alpha_matting_base_size,
+                            only_mask=args.only_mask,
+                            background_color=background_color,
+                            background_image=background_image,
                         ),
                     )
+        return
+
+    # Handle stdin/stdout pipe support
+    # When using pipes, we assume image input unless file extension is detected
+    if args.input.name == "<stdin>" or args.output.name == "<stdout>":
+        # Pipe mode - assume image processing
+        r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
+        w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
+        w(
+            args.output,
+            remove(
+                r(args.input),
+                model_name=args.model,
+                alpha_matting=args.alpha_matting,
+                alpha_matting_foreground_threshold=args.alpha_matting_foreground_threshold,
+                alpha_matting_background_threshold=args.alpha_matting_background_threshold,
+                alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
+                alpha_matting_base_size=args.alpha_matting_base_size,
+                only_mask=args.only_mask,
+                background_color=background_color,
+                background_image=background_image,
+            ),
+        )
         return
 
     ext = os.path.splitext(args.input.name)[1].lower()
@@ -327,7 +405,7 @@ def main():
                                                    frame_limit=args.framelimit,
                                                    framerate=args.framerate)
 
-    elif ext in [".jpg", ".jpeg", ".png"]:
+    elif ext in [".jpg", ".jpeg", ".png", ".heic", ".heif"]:
         r = lambda i: i.buffer.read() if hasattr(i, "buffer") else i.read()
         w = lambda o, data: o.buffer.write(data) if hasattr(o, "buffer") else o.write(data)
         w(
@@ -340,10 +418,15 @@ def main():
                 alpha_matting_background_threshold=args.alpha_matting_background_threshold,
                 alpha_matting_erode_structure_size=args.alpha_matting_erode_size,
                 alpha_matting_base_size=args.alpha_matting_base_size,
+                only_mask=args.only_mask,
+                background_color=background_color,
+                background_image=background_image,
             ),
         )
     else:
         print(f"❌ Unsupported file type: {ext}")
+        print(f"Supported image formats: .jpg, .jpeg, .png, .heic, .heif")
+        print(f"Supported video formats: .mp4, .mov, .webm, .ogg, .gif")
         exit(1)
 
 
