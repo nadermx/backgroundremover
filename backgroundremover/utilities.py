@@ -10,6 +10,7 @@ from .bg import DEVICE, Net, iter_frames, remove_many
 import tempfile
 import requests
 from pathlib import Path
+import moviepy
 
 multiprocessing.set_start_method('spawn', force=True)
 
@@ -36,15 +37,18 @@ def worker(worker_nodes,
         # are we processing frames faster than the frame ripper is saving them?
         last = fi[-1]
         while last not in frames_dict:
+
+            # print(F"WORKER {worker_index} WAITING FOR FRAME {last}")
             time.sleep(0.1)
 
         input_frames = [frames_dict[index] for index in fi]
         if script_net is None:
+            print("Compiling model for the first time, please wait...")
             script_net = torch.jit.trace(net,
                                          torch.as_tensor(np.stack(input_frames), dtype=torch.float32, device=DEVICE))
-
+        
         result_dict[output_index] = remove_many(input_frames, script_net)
-
+        
         # clean up the frame buffer
         for fdex in fi:
             del frames_dict[fdex]
@@ -54,6 +58,7 @@ def worker(worker_nodes,
 def capture_frames(file_path, frames_dict, prefetched_samples, total_frames):
     print(F"WORKER FRAMERIPPER ONLINE")
     for idx, frame in enumerate(iter_frames(file_path)):
+        # print("CAPTURE FRAME %d/%d\r" % (idx + 1, total_frames), end="")
         frames_dict[idx] = frame
         while len(frames_dict) > prefetched_samples:
             time.sleep(0.1)
@@ -75,22 +80,24 @@ def matte_key(output, file_path,
 
 
     info = ffmpeg.probe(file_path)
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-select_streams",
-        "v:0",
-        "-count_packets",
-        "-show_entries",
-        "stream=nb_read_packets",
-        "-of",
-        "csv=p=0",
-        file_path
-    ]
-    framerate_output = sp.check_output(cmd, universal_newlines=True)
+    # cmd = [
+    #     "ffprobe",
+    #     "-v",
+    #     "error",
+    #     "-select_streams",
+    #     "v:0",
+    #     "-count_packets",
+    #     "-show_entries",
+    #     "stream=nb_read_packets",
+    #     "-of",
+    #     "csv=p=0",
+    #     file_path
+    # ]
+    # framerate_output = sp.check_output(cmd, universal_newlines=True)
 
-    total_frames = int(framerate_output.split(",")[0])
+    # total_frames = int(framerate_output.split(",")[0])
+    total_frames = moviepy.VideoFileClip(file_path)
+    total_frames = int(total_frames.n_frames)
     if frame_limit != -1:
         total_frames = min(frame_limit, total_frames)
 
@@ -105,7 +112,7 @@ def matte_key(output, file_path,
     if framerate == -1:
         print(F"FRAME RATE DETECTED: {frame_rate_str} (if this looks wrong, override the frame rate)")
         framerate = math.ceil(eval(frame_rate_str))
-
+    # total_frames = total_frames -1  # ffmpeg quirk, always one less frame than expected
     print(F"FRAME RATE: {framerate} TOTAL FRAMES: {total_frames}")
 
     p = multiprocessing.Process(target=capture_frames,
