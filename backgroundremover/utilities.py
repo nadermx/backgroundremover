@@ -129,10 +129,29 @@ def matte_key(output, file_path,
 
             hash_index = i * worker_nodes + 1 + wx
 
-            while hash_index not in results_dict:
-                time.sleep(0.1)
+            try:
+                timeout_counter = 0
+                while hash_index not in results_dict:
+                    time.sleep(0.1)
+                    timeout_counter += 1
+                    # Check if workers are still alive every 10 seconds
+                    if timeout_counter % 100 == 0:
+                        dead_workers = [w for w in workers if not w.is_alive()]
+                        if dead_workers and hash_index not in results_dict:
+                            raise RuntimeError(f"Worker process crashed while waiting for frame batch {hash_index}. Try reducing worker count with -wn 1")
 
-            frames = results_dict[hash_index]
+                frames = results_dict[hash_index]
+            except (ConnectionResetError, BrokenPipeError) as e:
+                print(f"\nError: Worker connection lost (frame batch {hash_index}). This often happens with high worker counts.")
+                print("Try reducing workers with -wn 1 or -wn 2")
+                # Clean up
+                p.terminate()
+                for w in workers:
+                    w.terminate()
+                if proc:
+                    proc.stdin.close()
+                    proc.wait()
+                raise RuntimeError(f"Worker connection error: {e}")
             # dont block access to it anymore
             del results_dict[hash_index]
 

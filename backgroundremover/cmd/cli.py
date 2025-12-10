@@ -212,6 +212,27 @@ def main():
 
     args = ap.parse_args()
 
+    # Validate that -toi and -tov have their required background arguments
+    if args.transparentvideooverimage and (not args.backgroundimage or args.backgroundimage.name == "<stdin>"):
+        print("Error: -toi/--transparentvideooverimage requires -bi/--backgroundimage to specify the background image.")
+        print("Example: backgroundremover -i video.mp4 -toi -bi background.png -o output.mov")
+        exit(1)
+
+    if args.transparentvideoovervideo and (not args.backgroundvideo or args.backgroundvideo.name == "<stdin>"):
+        print("Error: -tov/--transparentvideoovervideo requires -bv/--backgroundvideo to specify the background video.")
+        print("Example: backgroundremover -i video.mp4 -tov -bv background.mp4 -o output.mov")
+        exit(1)
+
+    if args.transparentgifwithbackground and (not args.backgroundimage or args.backgroundimage.name == "<stdin>"):
+        print("Error: -tgwb/--transparentgifwithbackground requires -bi/--backgroundimage to specify the background image.")
+        print("Example: backgroundremover -i video.mp4 -tgwb -bi background.png -o output.gif")
+        exit(1)
+
+    # Warn about high worker counts that may cause issues
+    if args.workernodes > 4:
+        print(f"Warning: Using {args.workernodes} workers. High worker counts (>4) may cause ConnectionResetError or crashes on some systems.")
+        print("If you experience errors, try reducing workers with -wn 1 or -wn 2")
+
     # Parse background color if provided
     background_color = None
     if args.background_color:
