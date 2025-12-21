@@ -128,6 +128,18 @@ def main():
         type=lambda x: bool(strtobool(x)),
         help="Output transparent video format mov",
     )
+    ap.add_argument(
+        "--alpha-codec",
+        default="auto",
+        type=str,
+        help="Codec for transparent video output (auto, prores_ks, qtrle, libvpx-vp9). Auto defaults to lossless qtrle.",
+    )
+    ap.add_argument(
+        "--alpha-pix-fmt",
+        default=None,
+        type=str,
+        help="Override pixel format for transparent video output (e.g., yuva444p10le).",
+    )
 
     ap.add_argument(
         "-tov",
@@ -282,7 +294,9 @@ def main():
                                                gpu_batchsize=args.gpubatchsize,
                                                model_name=args.model,
                                                frame_limit=args.framelimit,
-                                               framerate=args.framerate)
+                                               framerate=args.framerate,
+                                               alpha_codec=args.alpha_codec,
+                                               alpha_pix_fmt=args.alpha_pix_fmt)
                 elif args.transparentvideoovervideo:
                     utilities.transparentvideoovervideo(output_path, os.path.abspath(args.backgroundvideo.name),
                                                         input_path,
@@ -290,7 +304,9 @@ def main():
                                                         gpu_batchsize=args.gpubatchsize,
                                                         model_name=args.model,
                                                         frame_limit=args.framelimit,
-                                                        framerate=args.framerate)
+                                                        framerate=args.framerate,
+                                                        alpha_codec=args.alpha_codec,
+                                                        alpha_pix_fmt=args.alpha_pix_fmt)
                 elif args.transparentvideooverimage:
                     utilities.transparentvideooverimage(output_path, os.path.abspath(args.backgroundimage.name),
                                                         input_path,
@@ -298,7 +314,9 @@ def main():
                                                         gpu_batchsize=args.gpubatchsize,
                                                         model_name=args.model,
                                                         frame_limit=args.framelimit,
-                                                        framerate=args.framerate)
+                                                        framerate=args.framerate,
+                                                        alpha_codec=args.alpha_codec,
+                                                        alpha_pix_fmt=args.alpha_pix_fmt)
                 elif args.transparentgif:
                     utilities.transparentgif(output_path, input_path,
                                              worker_nodes=args.workernodes,
@@ -373,7 +391,9 @@ def main():
                                        gpu_batchsize=args.gpubatchsize,
                                        model_name=args.model,
                                        frame_limit=args.framelimit,
-                                       framerate=args.framerate)
+                                       framerate=args.framerate,
+                                       alpha_codec=args.alpha_codec,
+                                       alpha_pix_fmt=args.alpha_pix_fmt)
         elif args.transparentvideoovervideo:
             utilities.transparentvideoovervideo(os.path.abspath(args.output.name), os.path.abspath(args.backgroundvideo.name),
                                                 os.path.abspath(args.input.name),
@@ -381,7 +401,9 @@ def main():
                                                 gpu_batchsize=args.gpubatchsize,
                                                 model_name=args.model,
                                                 frame_limit=args.framelimit,
-                                                framerate=args.framerate)
+                                                framerate=args.framerate,
+                                                alpha_codec=args.alpha_codec,
+                                                alpha_pix_fmt=args.alpha_pix_fmt)
         elif args.transparentvideooverimage:
             utilities.transparentvideooverimage(os.path.abspath(args.output.name), os.path.abspath(args.backgroundimage.name),
                                                 os.path.abspath(args.input.name),
@@ -389,7 +411,9 @@ def main():
                                                 gpu_batchsize=args.gpubatchsize,
                                                 model_name=args.model,
                                                 frame_limit=args.framelimit,
-                                                framerate=args.framerate)
+                                                framerate=args.framerate,
+                                                alpha_codec=args.alpha_codec,
+                                                alpha_pix_fmt=args.alpha_pix_fmt)
         elif args.transparentgif:
             utilities.transparentgif(os.path.abspath(args.output.name), os.path.abspath(args.input.name),
                                      worker_nodes=args.workernodes,

@@ -288,7 +288,16 @@ backgroundremover -i "/path/to/video.mp4" -mk -o "output.matte.mp4"
 
 ### Video Playback and Compatibility
 
-**Important:** The transparent `.mov` files created by this tool use the `qtrle` (QuickTime RLE) codec with alpha channel. Not all video players support this format correctly.
+**Important:** Transparent `.mov` outputs default to the lossless `qtrle` (QuickTime RLE) codec with alpha channel. This is large but preserves transparency. You can switch codecs with `--alpha-codec` for smaller or more compatible outputs.
+
+Examples:
+```bash
+# macOS-friendly ProRes 4444 (still large, but more compatible)
+backgroundremover -i "video.mp4" -tv --alpha-codec prores_ks -o "output.mov"
+
+# Smaller WebM with alpha (if your tools support it)
+backgroundremover -i "video.mp4" -tv --alpha-codec libvpx-vp9 -o "output.webm"
+```
 
 **Recommended video players:**
 - **mpv** (https://mpv.io) - Best support for transparent videos (Linux, Mac, Windows)
