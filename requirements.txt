@@ -17,7 +17,7 @@ pymatting
 filetype
 hsh
 more_itertools
-moviepy>=2.0.0
+moviepy>=1.0.3
 Pillow
 pillow-heif
 ffmpeg-python

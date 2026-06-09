@@ -1,7 +1,7 @@
 include pyproject.toml
 
 # Include the README
-include *.md
+include README.md
 
 # Include the license file
 include LICENSE.txt

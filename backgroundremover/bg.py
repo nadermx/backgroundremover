@@ -2,11 +2,17 @@ import io
 import os
 import typing
 from PIL import Image, ImageOps
+# Pillow>=10 removed Image.ANTIALIAS; moviepy 1.x still references it during resize.
+if not hasattr(Image, "ANTIALIAS"):
+    Image.ANTIALIAS = getattr(getattr(Image, "Resampling", Image), "LANCZOS")
 from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 from pymatting.util.util import stack_images
 from scipy.ndimage.morphology import binary_erosion
-from moviepy import VideoFileClip
+try:
+    from moviepy import VideoFileClip
+except ImportError:  # moviepy 1.x exposes it under moviepy.editor
+    from moviepy.editor import VideoFileClip
 import numpy as np
 import torch
 import torch.nn.functional
@@ -335,7 +341,12 @@ def remove(
 
 
 def iter_frames(path):
-    return VideoFileClip(path).resized(height=320).iter_frames(dtype="uint8")
+    clip = VideoFileClip(path)
+    # moviepy 2.x renamed Clip.resize() -> Clip.resized(); support both.
+    resizer = getattr(clip, "resized", None) or getattr(clip, "resize", None)
+    if resizer is not None:
+        clip = resizer(height=320)
+    return clip.iter_frames(dtype="uint8")
 
 
 @torch.no_grad()
