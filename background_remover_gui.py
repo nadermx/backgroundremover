@@ -9,7 +9,6 @@ from tkinter import ttk, filedialog, messagebox
 import os
 from PIL import Image, ImageTk
 import threading
-from backgroundremover.bg import remove
 
 
 class BackgroundRemoverGUI:
@@ -212,6 +211,7 @@ class BackgroundRemoverGUI:
     def _process_image_thread(self):
         """Process image in background thread"""
         try:
+            from backgroundremover.bg import remove
             # Read input image
             with open(self.input_file.get(), "rb") as f:
                 input_data = f.read()
@@ -236,7 +236,11 @@ class BackgroundRemoverGUI:
             
         except Exception as e:
             # Handle errors in main thread
-            self.root.after(0, lambda: self._processing_error(str(e)))
+            error_msg = str(e).strip()
+            if not error_msg or error_msg == "None":
+                error_msg = type(e).__name__
+
+            self.root.after(0, lambda: self._processing_error(error_msg))
     
     def _processing_complete(self):
         """Called when processing is complete"""
